@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jonny Shalom — Graphic Design</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600;700;800;900&family=Fraunces:ital,wght@0,500;0,600;0,900;1,500;1,600&display=swap');
+
+  :root{
+    --paper:#F7F2EA;
+    --ink:#1C1A17;
+    --stone:#7A7468;
+    --signal:#B5481F;
+    --teal:#1F4D4A;
+    --line: rgba(28,26,23,0.12);
+    --max: 1240px;
+  }
+
+  *{margin:0;padding:0;box-sizing:border-box;}
+
+  html{scroll-behavior:smooth;}
+
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  a{color:inherit;text-decoration:none;}
+
+  ::selection{background:var(--signal);color:var(--paper);}
+
+  .wrap{max-width:var(--max);margin:0 auto;padding:0 32px;}
+
+  .mono{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--stone);
+  }
+
+  /* ---------- focus ---------- */
+  a:focus-visible, button:focus-visible{
+    outline:2px solid var(--signal);
+    outline-offset:4px;
+  }
+
+  /* ---------- nav ---------- */
+  header{
+    position:fixed;top:0;left:0;right:0;
+    z-index:100;
+    background:rgba(247,246,242,0.85);
+    backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+  }
+  .nav-inner{
+    display:flex;align-items:center;justify-content:space-between;
+    height:72px;
+  }
+  .nav-mark{
+    font-family:'Fraunces',serif;
+    font-weight:700;font-size:19px;letter-spacing:-0.01em;
+  }
+  .nav-links{
+    display:flex;gap:36px;
+  }
+  .nav-links a{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;letter-spacing:0.06em;text-transform:uppercase;
+    color:var(--ink);
+    position:relative;
+    padding-bottom:4px;
+  }
+  .nav-links a::after{
+    content:'';position:absolute;left:0;bottom:0;
+    width:0;height:1px;background:var(--signal);
+    transition:width 0.25s ease;
+  }
+  .nav-links a:hover::after{width:100%;}
+
+  .nav-cta{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;letter-spacing:0.06em;text-transform:uppercase;
+    border:1px solid var(--ink);
+    padding:9px 16px;
+    transition:background 0.2s ease, color 0.2s ease;
+  }
+  .nav-cta:hover{background:var(--ink);color:var(--paper);}
+
+  .menu-toggle{display:none;}
+
+  /* ---------- hero ---------- */
+  .hero{
+    min-height:100vh;
+    display:flex;flex-direction:column;justify-content:center;
+    padding-top:120px;padding-bottom:80px;
+    position:relative;
+  }
+
+  .hero-eyebrow{
+    display:flex;align-items:center;gap:10px;
+    margin-bottom:28px;
+  }
+  .hero-eyebrow .dot{
+    width:7px;height:7px;border-radius:50%;background:var(--signal);
+    animation:pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:1;}
+    50%{opacity:0.35;}
+  }
+
+  .wordmark{
+    font-family:'Fraunces',serif;
+    font-weight:900;
+    line-height:0.86;
+    letter-spacing:-0.03em;
+    font-size:clamp(56px,11vw,168px);
+    display:block;
+  }
+  .wordmark .graphics{
+    font-family:'Fraunces',serif;
+    font-weight:500;
+    font-style:italic;
+    text-transform:lowercase;
+    letter-spacing:-0.01em;
+    color:var(--teal);
+    transition:color 0.4s ease;
+    cursor:default;
+    font-size:0.34em;
+    display:inline-block;
+    vertical-align:middle;
+    margin-left:0.15em;
+  }
+  .wordmark .graphics:hover{color:var(--signal);}
+
+  .hero-sub{
+    margin-top:40px;
+    max-width:560px;
+    font-size:19px;
+    line-height:1.55;
+    color:var(--ink);
+  }
+  .hero-sub strong{font-weight:600;}
+
+  .hero-bottom-row{
+    margin-top:64px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-end;
+    gap:24px;
+    flex-wrap:wrap;
+    border-top:1px solid var(--line);
+    padding-top:24px;
+  }
+
+  .scope-list{
+    display:flex;gap:28px;flex-wrap:wrap;
+  }
+  .scope-list span{
+    font-family:'JetBrains Mono',monospace;
+    font-size:12px;
+    color:var(--ink);
+  }
+  .scope-list span::before{
+    content:'— ';
+    color:var(--signal);
+  }
+
+  /* ---------- section shared ---------- */
+  section{padding:120px 0;border-bottom:1px solid var(--line);}
+  .section-head{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    margin-bottom:64px;gap:24px;flex-wrap:wrap;
+  }
+  .section-title{
+    font-family:'Fraunces',serif;
+    font-size:clamp(32px,4.5vw,52px);
+    font-weight:600;
+    letter-spacing:-0.02em;
+    line-height:1.05;
+  }
+
+  /* ---------- work grid ---------- */
+  .work-grid{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+  }
+  .work-item{
+    background:var(--paper);
+    padding:0;
+    min-height:420px;
+    display:flex;flex-direction:column;
+    position:relative;
+    overflow:hidden;
+  }
+  .work-item-top{
+    display:flex;justify-content:space-between;align-items:flex-start;
+    padding:28px 32px 0;
+  }
+  .work-img-wrap{
+    flex:1;
+    margin:20px 0;
+    overflow:hidden;
+    display:flex;align-items:center;justify-content:center;
+    background:#0e0d0c;
+  }
+  .work-img-wrap img{
+    width:100%;height:100%;
+    object-fit:cover;
+    object-position:top center;
+    display:block;
+    transition:transform 0.5s ease;
+  }
+  .work-item:hover .work-img-wrap img{transform:scale(1.04);}
+  .work-item-bottom{padding:0 32px 32px;}
+
+  .work-tag{
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;letter-spacing:0.06em;text-transform:uppercase;
+    color:var(--stone);
+    background:var(--paper);
+    padding:4px 10px;
+    border:1px solid var(--line);
+  }
+  .work-tag.tag-terracotta{color:var(--signal);border-color:rgba(181,72,31,0.35);}
+  .work-tag.tag-teal{color:var(--teal);border-color:rgba(31,77,74,0.35);}
+  .work-arrow{
+    font-size:20px;
+    transform:rotate(0deg) translate(0,0);
+    transition:transform 0.3s ease, color 0.3s ease;
+    color:var(--ink);
+  }
+  .work-item:hover .work-arrow{
+    transform:rotate(45deg) translate(2px,-2px);
+    color:var(--signal);
+  }
+
+  .work-visual{
+    flex:1;
+    margin:32px 0;
+    border-radius:2px;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'JetBrains Mono',monospace;
+    font-size:11px;
+    color:var(--stone);
+    position:relative;
+    overflow:hidden;
+  }
+
+  .work-item-bottom h3{
+    font-family:'Fraunces',serif;
+    font-size:26px;font-weight:600;letter-spacing:-0.01em;margin-bottom:6px;
+  }
+  .work-item-bottom p{
+    font-size:14px;color:var(--stone);
+  }
+
+  /* real work images now used instead of generated placeholders */
+
+
+  /* ---------- process ---------- */
+  .process-grid{
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:40px;
+  }
+  .process-step .mono{margin-bottom:18px;display:block;}
+  .process-step h4{
+    font-size:20px;font-weight:700;margin-bottom:10px;letter-spacing:-0.01em;
+  }
+  .process-step p{
+    font-size:14.5px;color:var(--stone);line-height:1.6;
+  }
+
+  /* ---------- about / strip ---------- */
+  .about-grid{
+    display:grid;
+    grid-template-columns:1.3fr 1fr;
+    gap:80px;
+    align-items:start;
+  }
+  .about-text p{
+    font-size:20px;
+    line-height:1.6;
+    margin-bottom:24px;
+    max-width:560px;
+  }
+  .about-text p:first-child{font-weight:600;}
+
+  .stat-list{
+    display:flex;flex-direction:column;gap:0;
+    border-top:1px solid var(--line);
+  }
+  .stat-row{
+    display:flex;justify-content:space-between;align-items:baseline;
+    padding:22px 0;
+    border-bottom:1px solid var(--line);
+  }
+  .stat-row .num{font-family:'Fraunces',serif;font-size:36px;font-weight:600;letter-spacing:-0.01em;color:var(--teal);}
+  .stat-row .label{font-family:'JetBrains Mono',monospace;font-size:11px;text-transform:uppercase;color:var(--stone);letter-spacing:0.06em;text-align:right;max-width:160px;}
+
+  /* ---------- contact ---------- */
+  .contact{
+    border-bottom:none;
+    padding-bottom:80px;
+  }
+  .contact-inner{
+    display:flex;flex-direction:column;align-items:flex-start;
+  }
+  .contact-title{
+    font-family:'Fraunces',serif;
+    font-size:clamp(40px,7vw,96px);
+    font-weight:900;
+    letter-spacing:-0.025em;
+    line-height:0.98;
+    max-width:900px;
+  }
+  .contact-title .accent{color:var(--signal);font-style:italic;font-weight:500;}
+
+  .contact-link{
+    margin-top:48px;
+    display:inline-flex;align-items:center;gap:14px;
+    font-size:22px;font-weight:600;
+    border-bottom:2px solid var(--ink);
+    padding-bottom:8px;
+    transition:border-color 0.25s ease, color 0.25s ease, gap 0.25s ease;
+  }
+  .contact-link:hover{border-color:var(--signal);color:var(--signal);gap:20px;}
+
+  .contact-meta{
+    margin-top:64px;
+    display:flex;gap:48px;flex-wrap:wrap;
+  }
+  .contact-meta div span{display:block;}
+  .contact-meta .mono{margin-bottom:8px;}
+  .contact-meta .val{font-size:15px;font-weight:500;}
+
+  footer{
+    padding:28px 0;
+  }
+  .footer-inner{
+    display:flex;justify-content:space-between;align-items:center;
+    flex-wrap:wrap;gap:12px;
+  }
+
+  /* ---------- reduced motion ---------- */
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important;transition:none !important;scroll-behavior:auto !important;}
+  }
+
+  /* ---------- responsive ---------- */
+  @media (max-width: 900px){
+    .nav-links{display:none;}
+    .work-grid{grid-template-columns:1fr;}
+    .process-grid{grid-template-columns:repeat(2,1fr);}
+    .about-grid{grid-template-columns:1fr;gap:48px;}
+  }
+  @media (max-width: 560px){
+    .process-grid{grid-template-columns:1fr;}
+    .hero-bottom-row{flex-direction:column;align-items:flex-start;gap:24px;}
+    .wrap{padding:0 20px;}
+    .work-item{padding:32px 24px;min-height:300px;}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap nav-inner">
+    <div class="nav-mark">JS<span style="color:var(--signal)">/</span>graphics</div>
+    <nav class="nav-links">
+      <a href="#work">Work</a>
+      <a href="#process">Process</a>
+      <a href="#about">About</a>
+    </nav>
+    <a href="https://wa.me/2348166547674" target="_blank" rel="noopener" class="nav-cta">Message on WhatsApp</a>
+  </div>
+</header>
+
+<main>
+
+  <section class="hero wrap" style="border-bottom:1px solid var(--line);">
+    <div class="hero-eyebrow">
+      <span class="dot"></span>
+      <span class="mono">Open for freelance projects — Summer 2026</span>
+    </div>
+
+    <h1 class="wordmark">
+      JONNY SHALOM<span class="graphics">graphics</span>
+    </h1>
+
+    <p class="hero-sub">Full-service graphics design — logos, flyers, branding, social media, print, and more. Whatever you need designed, <strong>I design it</strong>.</p>
+
+    <div class="hero-bottom-row">
+      <div class="scope-list">
+        <span>Logo design</span>
+        <span>Branding</span>
+        <span>Flyers &amp; posters</span>
+        <span>Social media</span>
+        <span>Print &amp; packaging</span>
+      </div>
+      <a href="#work" class="mono" style="border-bottom:1px solid var(--ink);padding-bottom:3px;">View selected work ↓</a>
+    </div>
+  </section>
+
+  <section id="work" class="wrap">
+    <div class="section-head">
+      <h2 class="section-title">Selected<br>work</h2>
+      <p class="mono" style="max-width:280px;text-align:right;">Six pieces from recent client work. Click any to view full size.</p>
+    </div>
+
+    <div class="work-grid">
+      <a class="work-item" href="images/bolaji-barbing.jpg" target="_blank" rel="noopener">
+        <div class="work-item-top">
+          <span class="work-tag tag-terracotta">Flyer Design</span>
+          <span class="work-arrow">→</span>
+        </div>
+        <div class="work-img-wrap">
+          <img src="bolaji-barbing.jpg" alt="Bolaji Barbing Services promotional flyer design" loading="lazy">
+        </div>
+        <div class="work-item-bottom">
+          <h3>Bolaji Barbing Services</h3>
+          <p>Service flyer with portrait collage, icon-led service list, and WhatsApp call-to-action.</p>
+        </div>
+      </a>
+
+      <a class="work-item" href="images/js-brand-poster.jpg" target="_blank" rel="noopener">
+        <div class="work-item-top">
+          <span class="work-tag tag-terracotta">Branding</span>
+          <span class="work-arrow">→</span>
+        </div>
+        <div class="work-img-wrap">
+          <img src="js-brand-poster.jpg" alt="Jonny Shalom Graphics brand identity poster" loading="lazy">
+        </div>
+        <div class="work-item-bottom">
+          <h3>Studio Brand Poster</h3>
+          <p>Self-promotional identity piece — logo lockup, full service list, and contact details in one sheet.</p>
+        </div>
+      </a>
+
+      <a class="work-item" href="images/shalom-barbing.jpg" target="_blank" rel="noopener">
+        <div class="work-item-top">
+          <span class="work-tag tag-terracotta">Flyer Design</span>
+          <span class="work-arrow">→</span>
+        </div>
+        <div class="work-img-wrap">
+          <img src="shalom-barbing.jpg" alt="Jonny Shalom Barbing Services flyer with service icons and location" loading="lazy">
+        </div>
+        <div class="work-item-bottom">
+          <h3>Shalom Barbing Services</h3>
+          <p>Layered flyer with diagonal photo cuts, service icons, and full contact/location block.</p>
+        </div>
+      </a>
+
+      <a class="work-item" href="images/js-logo-3d.jpg" target="_blank" rel="noopener">
+        <div class="work-item-top">
+          <span class="work-tag tag-teal">Logo Design</span>
+          <span class="work-arrow">→</span>
+        </div>
+        <div class="work-img-wrap">
+          <img src="js-logo-3d.jpg" alt="JS monogram 3D metallic logo design" loading="lazy">
+        </div>
+        <div class="work-item-bottom">
+          <h3>JS Monogram Mark</h3>
+          <p>3D metallic logo treatment built around the studio's own initials.</p>
+        </div>
+      </a>
+
+      <a class="work-item" href="images/birthday-victor.jpg" target="_blank" rel="noopener">
+        <div class="work-item-top">
+          <span class="work-tag tag-teal">Social / Event</span>
+          <span class="work-arrow">→</span>
+        </div>
+        <div class="work-img-wrap">
+          <img src="birthday-victor.jpg" alt="Happy Birthday Victor social media flyer design" loading="lazy">
+        </div>
+        <div class="work-item-bottom">
+          <h3>Birthday Flyer — Victor</h3>
+          <p>Photo composite birthday graphic with layered portraits and bold typographic name treatment.</p>
+        </div>
+      </a>
+
+      <a class="work-item" href="images/birthday-kenny.jpg" target="_blank" rel="noopener">
+        <div class="work-item-top">
+          <span class="work-tag tag-teal">Social / Event</span>
+          <span class="work-arrow">→</span>
+        </div>
+        <div class="work-img-wrap">
+          <img src="birthday-kenny.jpg" alt="Happy Birthday Kenny B social media flyer design" loading="lazy">
+        </div>
+        <div class="work-item-bottom">
+          <h3>Birthday Flyer — Kenny B</h3>
+          <p>Gold foil-style lettering and framed photo gallery for a personal celebration graphic.</p>
+        </div>
+      </a>
+    </div>
+  </section>
+
+  <section id="process" class="wrap">
+    <div class="section-head">
+      <h2 class="section-title">How a project<br>actually runs</h2>
+    </div>
+    <div class="process-grid">
+      <div class="process-step">
+        <span class="mono">Brief</span>
+        <h4>Understand the problem</h4>
+        <p>A short call or written brief — what you sell, who it's for, what's not working today.</p>
+      </div>
+      <div class="process-step">
+        <span class="mono">Direction</span>
+        <h4>One strong concept</h4>
+        <p>Rather than five weak options, you get one considered direction with the reasoning behind it.</p>
+      </div>
+      <div class="process-step">
+        <span class="mono">Build</span>
+        <h4>Design, refine, repeat</h4>
+        <p>Structured rounds of revision until it's right — no open-ended scope creep.</p>
+      </div>
+      <div class="process-step">
+        <span class="mono">Handoff</span>
+        <h4>Files, ready to use</h4>
+        <p>Source files, exports, and brief usage notes so your team can run with it.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="about" class="wrap">
+    <div class="about-grid">
+      <div class="about-text">
+        <p>I'm Jonny Shalom, an independent graphic designer. I design everything — logos, branding, flyers, social media graphics, print, packaging, you name it.</p>
+        <p>I work directly with founders and small teams — no account managers, no middle layer. You brief me, I design it, we ship it.</p>
+        <p>Every project starts from the same question: what does this actually need to say, and how do we say it with the fewest possible moves?</p>
+      </div>
+      <div class="stat-list">
+        <div class="stat-row"><span class="num">7+</span><span class="label">Years in practice</span></div>
+        <div class="stat-row"><span class="num">40+</span><span class="label">Projects shipped</span></div>
+        <div class="stat-row"><span class="num">2</span><span class="label">Week avg. turnaround</span></div>
+        <div class="stat-row"><span class="num">1</span><span class="label">Designer, no hand-offs</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="contact" class="wrap contact">
+    <div class="contact-inner">
+      <h2 class="contact-title">Got something<br>that needs <span class="accent">design?</span></h2>
+      <a href="mailto:adeyeyejohn54@gmail.com" class="contact-link">adeyeyejohn54@gmail.com →</a>
+      <a href="https://wa.me/2348166547674" target="_blank" rel="noopener" class="contact-link" style="margin-top:20px;font-size:18px;">WhatsApp: +234 816 654 7674 →</a>
+
+      <div class="contact-meta">
+        <div>
+          <span class="mono">Based in</span>
+          <span class="val">Available remote, worldwide</span>
+        </div>
+        <div>
+          <span class="mono">Response time</span>
+          <span class="val">Within 1–2 business days</span>
+        </div>
+        <div>
+          <span class="mono">Currently</span>
+          <span class="val">Booking new projects</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="wrap">
+  <div class="footer-inner">
+    <span class="mono">© 2026 Jonny Shalom Graphics</span>
+    <span class="mono">Identity — Print — Digital</span>
+  </div>
+</footer>
+
+</body>
+</html>
