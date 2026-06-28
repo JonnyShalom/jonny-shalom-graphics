@@ -1,0 +1,1158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- ============================================================
+     JONNY SHALOM GRAPHICS — Contact & Client Portal
+     Extends: index.html design system
+     Version: 1.0  |  Pure HTML + CSS + Vanilla JS
+     ============================================================ -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Contact Jonny Shalom Graphics — WhatsApp, email, or book a consultation. Start your design project today.">
+<meta name="theme-color" content="#0F0E0C">
+<title>Contact & Client Portal — Jonny Shalom Graphics</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   DESIGN TOKENS — identical to index.html
+   ============================================================ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --black:   #0F0E0C;
+  --card:    #1A1917;
+  --card2:   #222018;
+  --cream:   #F5F0E8;
+  --gold:    #D4A853;
+  --gold2:   #B8893A;
+  --stone:   #6B6560;
+  --line:    rgba(245,240,232,0.1);
+  --line2:   rgba(212,168,83,0.2);
+  --wa:      #25D366;
+  --red:     #E05252;
+  --green:   #52C878;
+  --blue:    #4A90D9;
+  --nav-h:   68px;
+  --max-w:   1200px;
+  --ease:    cubic-bezier(.16,1,.3,1);
+}
+
+body.light-mode {
+  --black:   #F5F0E8;
+  --card:    #EDE8DF;
+  --card2:   #E5DFD5;
+  --cream:   #1A1917;
+  --stone:   #7A7468;
+  --line:    rgba(26,25,23,0.12);
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--black); color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden; -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+button { font-family: inherit; cursor: pointer; }
+::selection { background: var(--gold); color: var(--black); }
+
+/* Utilities */
+.mono {
+  font-family: 'DM Mono', monospace; font-size: 11px;
+  letter-spacing: .1em; text-transform: uppercase; color: var(--stone);
+}
+.em-gold { color: var(--gold); font-style: italic; }
+.gold { color: var(--gold); }
+
+/* ── Page loader ── */
+#page-loader {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--black);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px;
+  transition: opacity .6s ease, visibility .6s ease;
+}
+#page-loader.done { opacity: 0; visibility: hidden; }
+.loader-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(56px,12vw,120px); font-weight: 900; color: var(--gold);
+  opacity: 0; transform: scale(.85);
+  animation: logoIn .9s var(--ease) .2s forwards; letter-spacing: -.02em;
+}
+.loader-sub {
+  font-family: 'DM Mono', monospace; font-size: 12px;
+  letter-spacing: .28em; text-transform: uppercase; color: var(--cream);
+  opacity: 0; animation: fadeUp .7s ease .9s forwards;
+}
+.loader-track { width: 180px; height: 2px; background: rgba(245,240,232,.1); overflow: hidden; }
+.loader-fill { height: 100%; width: 0; background: var(--gold); animation: loadFill 1.4s ease .4s forwards; }
+@keyframes logoIn   { to { opacity:1; transform:scale(1); } }
+@keyframes fadeUp   { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+@keyframes loadFill { to { width:100%; } }
+
+/* ── Scroll-to-top & dark toggle ── */
+#scroll-top {
+  position: fixed; bottom: 100px; right: 28px; z-index: 200;
+  width: 44px; height: 44px;
+  background: var(--card); border: 1px solid var(--line2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; cursor: pointer;
+  opacity: 0; transform: translateY(10px); transition: .3s ease;
+}
+#scroll-top.visible { opacity: 1; transform: translateY(0); }
+#scroll-top:hover { background: var(--gold); color: var(--black); border-color: var(--gold); }
+#dm-toggle {
+  position: fixed; bottom: 155px; right: 28px; z-index: 200;
+  width: 44px; height: 44px;
+  background: var(--card); border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; cursor: pointer; transition: background .3s, border-color .3s;
+}
+#dm-toggle:hover { border-color: var(--gold); }
+
+/* ── Toast ── */
+#toast-wrap {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+  z-index: 8000; display: flex; flex-direction: column; gap: 10px; align-items: center; pointer-events: none;
+}
+.toast {
+  background: var(--card); border: 1px solid var(--line2);
+  color: var(--cream); font-size: 13px; padding: 12px 24px;
+  opacity: 0; transform: translateY(20px); transition: .35s ease;
+  display: flex; align-items: center; gap: 10px; pointer-events: none; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success .t-icon { color: var(--green); }
+.toast.error   .t-icon { color: var(--red); }
+
+/* ============================================================
+   NAVIGATION — exact match
+   ============================================================ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(15,14,12,.92); backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+  height: var(--nav-h);
+  display: flex; align-items: center; justify-content: space-between; padding: 0 32px;
+  transition: background .3s;
+}
+nav.scrolled { background: rgba(15,14,12,.98); }
+.nav-logo { font-family: 'Playfair Display', serif; font-size: 22px; font-weight: 700; color: var(--gold); letter-spacing: -.01em; }
+.nav-links { display: flex; gap: 32px; align-items: center; }
+.nav-links a {
+  font-size: 13px; font-weight: 500; color: var(--cream); opacity: .7;
+  transition: opacity .2s, color .2s; cursor: pointer; position: relative; padding-bottom: 4px;
+}
+.nav-links a::after {
+  content:''; position:absolute; bottom:0; left:0;
+  width:0; height:1px; background:var(--gold); transition:width .25s ease;
+}
+.nav-links a:hover::after,.nav-links a.active::after { width:100%; }
+.nav-links a:hover,.nav-links a.active { opacity:1; color:var(--gold); }
+.nav-cta { background:var(--gold)!important; color:var(--black)!important; opacity:1!important; padding:9px 18px; font-weight:600; font-size:13px; transition:background .2s!important; }
+.nav-cta::after { display:none!important; }
+.nav-cta:hover { background:var(--gold2)!important; }
+.hamburger { display:none; flex-direction:column; gap:5px; cursor:pointer; padding:4px; }
+.hamburger span { width:24px; height:2px; background:var(--cream); transition:.3s; }
+.hamburger.open span:nth-child(1) { transform:rotate(45deg) translate(5px,5px); }
+.hamburger.open span:nth-child(2) { opacity:0; }
+.hamburger.open span:nth-child(3) { transform:rotate(-45deg) translate(5px,-5px); }
+.mobile-menu {
+  display:none; position:fixed; top:var(--nav-h); left:0; right:0;
+  background:var(--card); border-bottom:1px solid var(--line);
+  padding:24px 32px; flex-direction:column; gap:20px; z-index:99;
+  animation:slideDown .3s ease;
+}
+@keyframes slideDown { from{opacity:0;transform:translateY(-8px);}to{opacity:1;transform:translateY(0);} }
+.mobile-menu.open { display:flex; }
+.mobile-menu a { font-size:16px; font-weight:500; opacity:.8; cursor:pointer; transition:opacity .2s,color .2s; }
+.mobile-menu a:hover { opacity:1; color:var(--gold); }
+
+/* ============================================================
+   REVEAL
+   ============================================================ */
+.reveal { opacity:0; transform:translateY(32px); transition:opacity .75s ease,transform .75s ease; }
+.reveal.visible { opacity:1; transform:translateY(0); }
+.reveal-l { opacity:0; transform:translateX(-32px); transition:opacity .75s ease,transform .75s ease; }
+.reveal-l.visible { opacity:1; transform:translateX(0); }
+.reveal-r { opacity:0; transform:translateX(32px); transition:opacity .75s ease,transform .75s ease; }
+.reveal-r.visible { opacity:1; transform:translateX(0); }
+
+/* ============================================================
+   HERO — Contact
+   ============================================================ */
+.c-hero {
+  min-height: calc(100vh - var(--nav-h));
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 80px 32px 60px; max-width: var(--max-w); margin: 0 auto;
+  padding-top: calc(var(--nav-h) + 80px);
+}
+.hero-eyebrow { display:flex; align-items:center; gap:10px; margin-bottom:32px; }
+.pulse { width:8px; height:8px; border-radius:50%; background:var(--gold); animation:pulse 2s infinite; }
+@keyframes pulse {
+  0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(212,168,83,.4);}
+  50%{opacity:.6;box-shadow:0 0 0 8px rgba(212,168,83,0);}
+}
+.c-hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(48px,9vw,120px);
+  font-weight: 900; line-height: .92;
+  letter-spacing: -.03em; margin-bottom: 28px;
+}
+.c-hero-desc {
+  font-size: 18px; line-height: 1.65;
+  max-width: 560px; color: rgba(245,240,232,.75); margin-bottom: 48px;
+}
+.c-hero-btns { display:flex; gap:16px; flex-wrap:wrap; }
+
+.btn-primary {
+  background:var(--gold); color:var(--black);
+  padding:14px 28px; font-weight:600; font-size:15px;
+  transition:background .2s,transform .2s;
+  display:inline-flex; align-items:center; gap:8px;
+  cursor:pointer; border:none; position:relative; overflow:hidden;
+}
+.btn-primary:hover { background:var(--gold2); transform:translateY(-2px); }
+.btn-outline {
+  border:1px solid rgba(245,240,232,.3); color:var(--cream);
+  padding:14px 28px; font-weight:500; font-size:15px;
+  transition:border-color .2s,color .2s,transform .2s;
+  display:inline-flex; align-items:center; gap:8px;
+  cursor:pointer; background:none;
+}
+.btn-outline:hover { border-color:var(--gold); color:var(--gold); transform:translateY(-2px); }
+
+/* Ripple */
+.ripple {
+  position:absolute; border-radius:50%;
+  background:rgba(255,255,255,.25);
+  transform:scale(0); animation:rippleAnim .6s linear; pointer-events:none;
+}
+@keyframes rippleAnim { to{transform:scale(4);opacity:0;} }
+
+/* ============================================================
+   SECTION SHARED
+   ============================================================ */
+.section { padding:100px 32px; max-width:var(--max-w); margin:0 auto; }
+.section-head { margin-bottom:64px; }
+.section-head .eyebrow { margin-bottom:16px; }
+.section-head h2 {
+  font-family:'Playfair Display',serif;
+  font-size:clamp(36px,5vw,64px); font-weight:900;
+  letter-spacing:-.025em; line-height:1;
+}
+.section-head p { margin-top:16px; font-size:16px; color:rgba(245,240,232,.65); max-width:520px; line-height:1.7; }
+
+/* ============================================================
+   CONTACT CARDS
+   ============================================================ */
+.contact-cards {
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:2px;
+  background:var(--line); border:1px solid var(--line); margin-bottom:80px;
+}
+.contact-card {
+  background:var(--card); padding:36px 32px;
+  display:flex; flex-direction:column; align-items:flex-start; gap:12px;
+  transition:background .3s; position:relative; overflow:hidden;
+  cursor:pointer;
+}
+.contact-card::before {
+  content:''; position:absolute; bottom:0; left:0; right:0; height:2px;
+  background:var(--gold); transform:scaleX(0); transform-origin:left; transition:transform .4s ease;
+}
+.contact-card:hover { background:var(--card2); }
+.contact-card:hover::before { transform:scaleX(1); }
+.cc-icon {
+  width:52px; height:52px; border-radius:50%;
+  background:rgba(212,168,83,.08); border:1px solid var(--line2);
+  display:flex; align-items:center; justify-content:center; font-size:22px;
+  transition:background .3s;
+}
+.contact-card:hover .cc-icon { background:rgba(212,168,83,.16); }
+.cc-label { font-family:'DM Mono',monospace; font-size:10px; letter-spacing:.1em; text-transform:uppercase; color:var(--stone); }
+.cc-val { font-size:14px; font-weight:500; line-height:1.4; }
+.cc-action {
+  margin-top:8px; font-family:'DM Mono',monospace; font-size:10px;
+  letter-spacing:.06em; text-transform:uppercase; color:var(--gold);
+  display:flex; align-items:center; gap:4px;
+}
+
+/* ============================================================
+   LIVE STATS — animated counters
+   ============================================================ */
+.stats-band {
+  background:var(--card); border-top:1px solid var(--line2); border-bottom:1px solid var(--line2);
+  padding:80px 32px;
+}
+.stats-inner {
+  max-width:var(--max-w); margin:0 auto;
+  display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:48px;
+}
+.stat-block { text-align:center; }
+.stat-num {
+  font-family:'Playfair Display',serif; font-size:clamp(48px,7vw,80px);
+  font-weight:900; color:var(--gold); letter-spacing:-.03em; line-height:1;
+  display:flex; align-items:flex-end; justify-content:center; gap:4px;
+}
+.stat-num .suffix { font-size:.45em; margin-bottom:6px; }
+.stat-label { margin-top:12px; font-size:13px; color:var(--stone); letter-spacing:.04em; }
+.stat-sub { font-size:11px; color:rgba(107,101,96,.6); margin-top:4px; font-family:'DM Mono',monospace; }
+
+/* ============================================================
+   BOOKING SECTION
+   ============================================================ */
+.booking-grid { display:grid; grid-template-columns:1fr 1fr; gap:80px; align-items:start; }
+.booking-info h3 { font-family:'Playfair Display',serif; font-size:32px; font-weight:700; margin-bottom:16px; }
+.booking-info p { font-size:15px; color:var(--stone); line-height:1.7; margin-bottom:24px; }
+.avail-slots { display:flex; flex-direction:column; gap:12px; }
+.slot {
+  background:var(--card); border:1px solid var(--line); padding:16px 20px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px;
+  transition:border-color .2s;
+}
+.slot:hover { border-color:var(--line2); }
+.slot-time { font-family:'DM Mono',monospace; font-size:12px; color:var(--gold); }
+.slot-label { font-size:14px; }
+.slot-status {
+  font-family:'DM Mono',monospace; font-size:10px; text-transform:uppercase;
+  padding:3px 8px; letter-spacing:.06em;
+}
+.slot-status.open { border:1px solid var(--green); color:var(--green); }
+.slot-status.busy { border:1px solid var(--line); color:var(--stone); }
+
+/* ============================================================
+   PROJECT INQUIRY FORM
+   ============================================================ */
+.inquiry-form { display:flex; flex-direction:column; gap:18px; }
+.form-row2 { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.form-row2.full { grid-template-columns:1fr; }
+.form-group2 { display:flex; flex-direction:column; gap:8px; }
+.form-group2 label {
+  font-family:'DM Mono',monospace; font-size:10px;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--stone);
+}
+.form-group2 label .req { color:var(--gold); margin-left:2px; }
+.form-group2 input,
+.form-group2 select,
+.form-group2 textarea {
+  background:var(--card2); border:1px solid var(--line);
+  color:var(--cream); font-family:'DM Sans',sans-serif;
+  font-size:14px; padding:13px 16px;
+  transition:border-color .2s, box-shadow .2s; outline:none; width:100%;
+}
+.form-group2 input:focus,
+.form-group2 select:focus,
+.form-group2 textarea:focus {
+  border-color:var(--gold); box-shadow:0 0 0 3px rgba(212,168,83,.08);
+}
+.form-group2 input.error,
+.form-group2 select.error,
+.form-group2 textarea.error { border-color:var(--red); }
+.field-error2 { font-size:11px; color:var(--red); display:none; margin-top:4px; }
+.field-error2.show { display:block; }
+.form-group2 select option { background:var(--card); }
+.form-group2 textarea { height:130px; resize:vertical; }
+.upload-area2 {
+  border:1px dashed rgba(212,168,83,.3); padding:24px; text-align:center;
+  cursor:pointer; transition:border-color .2s,background .2s; position:relative;
+}
+.upload-area2:hover { border-color:var(--gold); background:rgba(212,168,83,.04); }
+.upload-area2 input { position:absolute; inset:0; opacity:0; cursor:pointer; }
+.upload-area2 p { font-size:13px; color:var(--stone); }
+.upload-result { font-size:12px; color:var(--gold); margin-top:6px; }
+
+/* ============================================================
+   TESTIMONIALS CAROUSEL
+   ============================================================ */
+.carousel-wrap {
+  position:relative; overflow:hidden;
+}
+.carousel-track {
+  display:flex; gap:24px;
+  transition:transform .5s var(--ease);
+}
+.carousel-track .testi-card {
+  min-width:340px; flex-shrink:0;
+  background:var(--card); padding:36px; border:1px solid var(--line); position:relative;
+  transition:border-color .3s;
+}
+.carousel-track .testi-card:hover { border-color:var(--line2); }
+.carousel-track .testi-card::before {
+  content:'"'; font-family:'Playfair Display',serif;
+  font-size:80px; color:var(--gold); opacity:.25;
+  position:absolute; top:16px; left:24px; line-height:1;
+}
+.stars { color:var(--gold); font-size:14px; margin-bottom:12px; letter-spacing:2px; }
+.testi-text { font-size:15px; line-height:1.75; color:rgba(245,240,232,.8); margin-bottom:24px; padding-top:32px; }
+.testi-author { display:flex; align-items:center; gap:12px; }
+.testi-avatar {
+  width:44px; height:44px; border-radius:50%;
+  background:var(--gold); display:flex; align-items:center; justify-content:center;
+  font-family:'Playfair Display',serif; font-weight:700; color:var(--black); font-size:16px; flex-shrink:0;
+}
+.testi-name { font-weight:600; font-size:14px; }
+.testi-role { font-size:12px; color:var(--stone); margin-top:2px; }
+.carousel-controls {
+  display:flex; align-items:center; justify-content:center; gap:16px; margin-top:32px;
+}
+.carousel-btn {
+  width:44px; height:44px; background:var(--card); border:1px solid var(--line);
+  color:var(--cream); font-size:20px;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; transition:background .2s, border-color .2s;
+}
+.carousel-btn:hover { background:var(--gold); border-color:var(--gold); color:var(--black); }
+.carousel-dots { display:flex; gap:8px; align-items:center; }
+.dot {
+  width:6px; height:6px; border-radius:50%;
+  background:var(--stone); cursor:pointer; transition:background .2s,transform .2s;
+}
+.dot.active { background:var(--gold); transform:scale(1.4); }
+
+/* ============================================================
+   NEWSLETTER
+   ============================================================ */
+.newsletter-band {
+  background:var(--card); border-top:1px solid var(--line2); border-bottom:1px solid var(--line2);
+  padding:80px 32px; text-align:center;
+}
+.newsletter-band h2 { font-family:'Playfair Display',serif; font-size:clamp(28px,4vw,48px); font-weight:900; letter-spacing:-.025em; margin-bottom:12px; }
+.newsletter-band p { font-size:15px; color:var(--stone); max-width:440px; margin:0 auto 36px; line-height:1.7; }
+.newsletter-form {
+  display:flex; gap:0; max-width:480px; margin:0 auto;
+  border:1px solid var(--line2);
+}
+.newsletter-form input {
+  flex:1; background:var(--black); border:none;
+  color:var(--cream); font-family:'DM Sans',sans-serif;
+  font-size:14px; padding:14px 20px; outline:none;
+}
+.newsletter-form button {
+  background:var(--gold); color:var(--black);
+  border:none; padding:14px 24px; font-size:14px; font-weight:600;
+  cursor:pointer; transition:background .2s; white-space:nowrap;
+}
+.newsletter-form button:hover { background:var(--gold2); }
+
+/* ============================================================
+   MAP PLACEHOLDER
+   ============================================================ */
+.map-placeholder {
+  width:100%; height:320px; background:var(--card);
+  border:1px solid var(--line); position:relative;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:12px;
+  overflow:hidden;
+}
+.map-placeholder::before {
+  content:''; position:absolute; inset:0;
+  background:
+    repeating-linear-gradient(0deg, transparent, transparent 39px, rgba(245,240,232,.03) 40px),
+    repeating-linear-gradient(90deg, transparent, transparent 39px, rgba(245,240,232,.03) 40px);
+}
+.map-icon { font-size:48px; position:relative; z-index:1; }
+.map-label { font-family:'Playfair Display',serif; font-size:20px; font-weight:700; position:relative; z-index:1; }
+.map-sub { font-size:13px; color:var(--stone); position:relative; z-index:1; }
+.map-pin {
+  position:absolute; width:12px; height:12px; border-radius:50%;
+  background:var(--gold); box-shadow:0 0 0 4px rgba(212,168,83,.2);
+  animation:mapPulse 2s ease-in-out infinite; top:50%; left:50%;
+  transform:translate(-50%,-50%);
+}
+@keyframes mapPulse {
+  0%,100%{box-shadow:0 0 0 4px rgba(212,168,83,.2);}
+  50%{box-shadow:0 0 0 14px rgba(212,168,83,0);}
+}
+
+/* ============================================================
+   SUCCESS MODAL
+   ============================================================ */
+#success-modal {
+  position:fixed; inset:0; z-index:700;
+  background:rgba(0,0,0,.9);
+  display:none; align-items:center; justify-content:center;
+  padding:20px; backdrop-filter:blur(4px);
+}
+#success-modal.open { display:flex; }
+.success-box {
+  background:var(--card); border:1px solid var(--green);
+  padding:48px; text-align:center; max-width:440px; width:100%;
+  animation:modalIn .35s var(--ease);
+}
+@keyframes modalIn { from{opacity:0;transform:translateY(24px) scale(.97);}to{opacity:1;transform:translateY(0) scale(1);} }
+.success-icon { font-size:56px; margin-bottom:20px; }
+.success-box h3 { font-family:'Playfair Display',serif; font-size:28px; font-weight:700; margin-bottom:12px; }
+.success-box p { font-size:15px; color:var(--stone); line-height:1.65; margin-bottom:28px; }
+
+/* ============================================================
+   FLOATING CONTACT BUTTON
+   ============================================================ */
+#float-contact {
+  position:fixed; bottom:28px; left:28px; z-index:200;
+}
+.float-contact-btn {
+  display:flex; align-items:center; gap:10px;
+  background:var(--gold); color:var(--black);
+  padding:12px 20px; font-size:13px; font-weight:600;
+  cursor:pointer; border:none;
+  box-shadow:0 4px 20px rgba(212,168,83,.25);
+  transition:background .2s,transform .2s;
+}
+.float-contact-btn:hover { background:var(--gold2); transform:translateY(-2px); }
+
+/* ============================================================
+   FLOATING WHATSAPP
+   ============================================================ */
+#wa-bubble {
+  position:fixed; bottom:28px; right:28px; z-index:200;
+  display:flex; flex-direction:column; align-items:flex-end; gap:12px;
+}
+.wa-popup {
+  background:var(--card); border:1px solid var(--line);
+  padding:16px 20px; max-width:220px;
+  box-shadow:0 8px 32px rgba(0,0,0,.4);
+  opacity:0; transform:translateY(10px) scale(.95);
+  transition:.3s; pointer-events:none; display:none;
+}
+.wa-popup.show { opacity:1; transform:translateY(0) scale(1); pointer-events:all; display:block; }
+.wa-popup p { font-size:13px; line-height:1.5; color:var(--cream); margin-bottom:10px; }
+.wa-popup a { display:block; background:var(--wa); color:#fff; text-align:center; padding:10px; font-size:13px; font-weight:600; transition:opacity .2s; }
+.wa-popup a:hover { opacity:.85; }
+.wa-btn { width:56px; height:56px; border-radius:50%; background:var(--wa); display:flex; align-items:center; justify-content:center; cursor:pointer; box-shadow:0 4px 20px rgba(37,211,102,.3); transition:transform .2s; font-size:26px; }
+.wa-btn:hover { transform:scale(1.1); }
+
+/* ============================================================
+   FOOTER — exact match
+   ============================================================ */
+footer {
+  border-top:1px solid var(--line); padding:40px 32px;
+  max-width:var(--max-w); margin:0 auto;
+  display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:16px;
+}
+.foot-logo { font-family:'Playfair Display',serif; font-size:18px; font-weight:700; color:var(--gold); }
+.foot-links { display:flex; gap:24px; flex-wrap:wrap; }
+.foot-links a { font-size:13px; color:var(--stone); transition:color .2s; cursor:pointer; }
+.foot-links a:hover { color:var(--gold); }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media(max-width:900px){
+  .nav-links{display:none;}
+  .hamburger{display:flex;}
+  .section{padding:60px 20px;}
+  .c-hero{padding:40px 20px;padding-top:calc(var(--nav-h)+40px);}
+  .booking-grid{grid-template-columns:1fr;}
+  .form-row2{grid-template-columns:1fr;}
+  .stats-band{padding:60px 20px;}
+  footer{padding:32px 20px;}
+  #dm-toggle,#scroll-top{right:16px;}
+  #float-contact{left:16px;bottom:16px;}
+}
+@media(max-width:560px){
+  .contact-cards{grid-template-columns:1fr 1fr;}
+  .carousel-track .testi-card{min-width:280px;}
+  .newsletter-form{flex-direction:column;}
+  .newsletter-form button{width:100%;}
+}
+@media(max-width:360px){
+  .contact-cards{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- PAGE LOADER -->
+<div id="page-loader" role="status" aria-label="Loading">
+  <div class="loader-logo" aria-hidden="true">JS</div>
+  <div class="loader-sub">Client Portal</div>
+  <div class="loader-track"><div class="loader-fill"></div></div>
+</div>
+
+<!-- NAV -->
+<nav id="main-nav" role="navigation" aria-label="Main navigation">
+  <a class="nav-logo" href="index.html" aria-label="Jonny Shalom Graphics home">JS/graphics</a>
+  <div class="nav-links" role="menubar">
+    <a href="index.html" role="menuitem">Home</a>
+    <a href="services.html" role="menuitem">Services</a>
+    <a href="index.html" role="menuitem">Portfolio</a>
+    <a href="index.html" role="menuitem">About</a>
+    <a href="contact.html" class="active" role="menuitem" aria-current="page">Contact</a>
+    <a href="services.html" class="nav-cta" role="menuitem">Order Now</a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Toggle mobile menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu" id="mobile-menu" role="menu">
+  <a href="index.html">Home</a>
+  <a href="services.html">Services</a>
+  <a href="index.html">Portfolio</a>
+  <a href="index.html">About</a>
+  <a href="contact.html" style="color:var(--gold)">Contact</a>
+  <a href="services.html" style="color:var(--gold)">Order Now →</a>
+</div>
+
+<main>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<section class="c-hero" aria-labelledby="hero-title">
+  <div class="hero-eyebrow reveal">
+    <div class="pulse" aria-hidden="true"></div>
+    <span class="mono">Open for New Projects — 2026</span>
+  </div>
+  <h1 id="hero-title" class="reveal">
+    Let's Create<br><em class="em-gold">Something</em><br>Amazing
+  </h1>
+  <p class="c-hero-desc reveal">
+    Have a project in mind? I'd love to hear about it. Reach out on WhatsApp for the fastest response, or fill in the form below and I'll get back to you within hours.
+  </p>
+  <div class="c-hero-btns reveal">
+    <a href="https://wa.me/2348166547674" target="_blank" rel="noopener" class="btn-primary">
+      <span>💬</span> Chat on WhatsApp
+    </a>
+    <a href="mailto:adeyeyejohn54@gmail.com" class="btn-outline">Send an Email</a>
+  </div>
+</section>
+
+<!-- ============================================================
+     CONTACT CARDS
+     ============================================================ -->
+<section class="section" aria-labelledby="contact-cards-title" style="padding-bottom:0">
+  <h2 id="contact-cards-title" class="sr-only">Contact Methods</h2>
+  <div class="contact-cards">
+    <a href="https://wa.me/2348166547674" target="_blank" rel="noopener" class="contact-card reveal" aria-label="WhatsApp">
+      <div class="cc-icon" aria-hidden="true">💬</div>
+      <div class="cc-label">WhatsApp</div>
+      <div class="cc-val">+234 816 654 7674</div>
+      <div class="cc-action">Message Now →</div>
+    </a>
+    <a href="mailto:adeyeyejohn54@gmail.com" class="contact-card reveal" aria-label="Email">
+      <div class="cc-icon" aria-hidden="true">📧</div>
+      <div class="cc-label">Email</div>
+      <div class="cc-val">adeyeyejohn54@gmail.com</div>
+      <div class="cc-action">Send Email →</div>
+    </a>
+    <a href="https://instagram.com/jonnyshalom" target="_blank" rel="noopener" class="contact-card reveal" aria-label="Instagram">
+      <div class="cc-icon" aria-hidden="true">📸</div>
+      <div class="cc-label">Instagram</div>
+      <div class="cc-val">@Jonny Shalom</div>
+      <div class="cc-action">Follow →</div>
+    </a>
+    <a href="https://facebook.com/jonnyshalom" target="_blank" rel="noopener" class="contact-card reveal" aria-label="Facebook">
+      <div class="cc-icon" aria-hidden="true">📘</div>
+      <div class="cc-label">Facebook</div>
+      <div class="cc-val">Jonny Shalom</div>
+      <div class="cc-action">Connect →</div>
+    </a>
+    <div class="contact-card reveal" aria-label="Location">
+      <div class="cc-icon" aria-hidden="true">📍</div>
+      <div class="cc-label">Location</div>
+      <div class="cc-val">Along Funato, Okeho, Oyo State, Nigeria</div>
+      <div class="cc-action">Remote Worldwide →</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     LIVE STATISTICS
+     ============================================================ -->
+<div class="stats-band" aria-labelledby="stats-title">
+  <div class="stats-inner">
+    <div class="stat-block reveal">
+      <div class="stat-num"><span class="counter" data-target="40" data-suffix="+">0</span><span class="suffix">+</span></div>
+      <div class="stat-label">Projects Completed</div>
+      <div class="stat-sub">and counting</div>
+    </div>
+    <div class="stat-block reveal">
+      <div class="stat-num"><span class="counter" data-target="35" data-suffix="+">0</span><span class="suffix">+</span></div>
+      <div class="stat-label">Happy Clients</div>
+      <div class="stat-sub">100% satisfaction</div>
+    </div>
+    <div class="stat-block reveal">
+      <div class="stat-num"><span class="counter" data-target="7">0</span><span class="suffix">+</span></div>
+      <div class="stat-label">Years Experience</div>
+      <div class="stat-sub">professional practice</div>
+    </div>
+    <div class="stat-block reveal">
+      <div class="stat-num"><span class="counter" data-target="2">0</span><span class="suffix">h</span></div>
+      <div class="stat-label">Avg. Response Time</div>
+      <div class="stat-sub">on WhatsApp</div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     BOOKING + INQUIRY FORM
+     ============================================================ -->
+<section class="section" aria-labelledby="booking-title">
+  <div class="booking-grid">
+
+    <!-- Left: Booking info -->
+    <div>
+      <div class="section-head reveal">
+        <div class="mono eyebrow">Book a Consultation</div>
+        <h2 id="booking-title">Available <em class="em-gold">Slots</em></h2>
+        <p>Book a free 15-minute consultation to discuss your project. Message on WhatsApp to confirm your slot.</p>
+      </div>
+      <div class="avail-slots reveal" id="slots-list">
+        <!-- Slots injected by JS -->
+      </div>
+      <div style="margin-top:28px;" class="reveal">
+        <a href="https://wa.me/2348166547674?text=Hi%20Jonny!%20I'd%20like%20to%20book%20a%20consultation." target="_blank" class="btn-primary">
+          Book via WhatsApp →
+        </a>
+      </div>
+    </div>
+
+    <!-- Right: Inquiry Form -->
+    <div>
+      <div class="section-head reveal">
+        <div class="mono eyebrow">Project Inquiry</div>
+        <h2>Start Your <em class="em-gold">Project</em></h2>
+        <p>Fill in the details below and I'll get back to you within 1–2 hours.</p>
+      </div>
+      <form class="inquiry-form reveal" id="inquiry-form" novalidate onsubmit="return false">
+        <div class="form-row2">
+          <div class="form-group2">
+            <label for="f-name">Full Name<span class="req">*</span></label>
+            <input id="f-name" type="text" placeholder="Your full name" autocomplete="name">
+            <span class="field-error2" id="e-name">Please enter your name</span>
+          </div>
+          <div class="form-group2">
+            <label for="f-company">Company / Brand</label>
+            <input id="f-company" type="text" placeholder="Optional" autocomplete="organization">
+          </div>
+        </div>
+        <div class="form-row2">
+          <div class="form-group2">
+            <label for="f-email">Email Address</label>
+            <input id="f-email" type="email" placeholder="you@email.com" autocomplete="email">
+          </div>
+          <div class="form-group2">
+            <label for="f-phone">Phone / WhatsApp<span class="req">*</span></label>
+            <input id="f-phone" type="tel" placeholder="+234..." autocomplete="tel">
+            <span class="field-error2" id="e-phone">Please enter your phone number</span>
+          </div>
+        </div>
+        <div class="form-row2">
+          <div class="form-group2">
+            <label for="f-service">Service Needed<span class="req">*</span></label>
+            <select id="f-service">
+              <option value="">Select a service…</option>
+              <option>Logo Design</option>
+              <option>Flyer Design</option>
+              <option>Social Media Design</option>
+              <option>Brand Identity</option>
+              <option>Business Card</option>
+              <option>Banner Design</option>
+              <option>Book Cover</option>
+              <option>Church Design</option>
+              <option>Birthday Flyer</option>
+              <option>Event Graphics</option>
+              <option>Packaging Design</option>
+              <option>Custom / Other</option>
+            </select>
+            <span class="field-error2" id="e-service">Please select a service</span>
+          </div>
+          <div class="form-group2">
+            <label for="f-budget">Budget (₦)</label>
+            <select id="f-budget">
+              <option value="">Select range…</option>
+              <option>Under ₦2,000</option>
+              <option>₦2,000 – ₦5,000</option>
+              <option>₦5,000 – ₦15,000</option>
+              <option>₦15,000 – ₦50,000</option>
+              <option>₦50,000+</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row2">
+          <div class="form-group2">
+            <label for="f-timeline">Timeline</label>
+            <select id="f-timeline">
+              <option value="">When do you need it?</option>
+              <option>Today / Same day</option>
+              <option>1–2 days</option>
+              <option>3–5 days</option>
+              <option>1–2 weeks</option>
+              <option>No rush</option>
+            </select>
+          </div>
+          <div class="form-group2">
+            <label for="f-deadline">Hard Deadline</label>
+            <input id="f-deadline" type="date">
+          </div>
+        </div>
+        <div class="form-row2 full">
+          <div class="form-group2">
+            <label for="f-msg">Project Message<span class="req">*</span></label>
+            <textarea id="f-msg" placeholder="Tell me about your project — what you need, colours, style, any references…"></textarea>
+            <span class="field-error2" id="e-msg">Please describe your project</span>
+          </div>
+        </div>
+        <div class="form-row2 full">
+          <div class="form-group2">
+            <label>Upload File (optional)</label>
+            <div class="upload-area2">
+              <input type="file" accept=".pdf,.png,.jpg,.docx,.zip" onchange="handleUpload2(this)">
+              <p>📎 Click to attach a brief, logo or reference image</p>
+              <p style="font-size:11px;margin-top:4px;color:var(--stone)">PDF, PNG, JPG, DOCX — max 10MB</p>
+              <div class="upload-result" id="upload-result2"></div>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn-primary" onclick="submitInquiry()" style="align-self:flex-start">
+          Send Inquiry →
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     TESTIMONIALS CAROUSEL
+     ============================================================ -->
+<section class="section" style="padding-top:0" aria-labelledby="carousel-title">
+  <div class="section-head reveal">
+    <div class="mono eyebrow">Client Reviews</div>
+    <h2 id="carousel-title">What Clients <em class="em-gold">Say</em></h2>
+  </div>
+  <div class="carousel-wrap reveal">
+    <div class="carousel-track" id="carousel-track"></div>
+  </div>
+  <div class="carousel-controls reveal">
+    <button class="carousel-btn" onclick="carouselNav(-1)" aria-label="Previous review">‹</button>
+    <div class="carousel-dots" id="carousel-dots"></div>
+    <button class="carousel-btn" onclick="carouselNav(1)" aria-label="Next review">›</button>
+  </div>
+</section>
+
+<!-- ============================================================
+     NEWSLETTER
+     ============================================================ -->
+<div class="newsletter-band reveal">
+  <div class="mono" style="margin-bottom:14px">Stay Connected</div>
+  <h2>Get Design <em class="em-gold">Tips</em> & Updates</h2>
+  <p>Subscribe to receive design tips, promotions, and new service announcements. No spam, ever.</p>
+  <div class="newsletter-form" role="form" aria-label="Newsletter subscription">
+    <input type="email" id="newsletter-email" placeholder="Enter your email address…" autocomplete="email">
+    <button onclick="subscribeNewsletter()">Subscribe →</button>
+  </div>
+</div>
+
+<!-- ============================================================
+     MAP PLACEHOLDER
+     ============================================================ -->
+<section class="section" aria-labelledby="location-title">
+  <div class="section-head reveal">
+    <div class="mono eyebrow">Location</div>
+    <h2 id="location-title">Find <em class="em-gold">Me</em></h2>
+    <p>Based in Okeho, Oyo State — available to work with clients worldwide via WhatsApp and email.</p>
+  </div>
+  <div class="map-placeholder reveal" role="img" aria-label="Map placeholder showing Okeho, Oyo State, Nigeria">
+    <div class="map-pin" aria-hidden="true"></div>
+    <div class="map-icon" aria-hidden="true">🗺️</div>
+    <div class="map-label">Okeho, Oyo State</div>
+    <div class="map-sub">Along Funato Road, Nigeria</div>
+  </div>
+</section>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">JS/graphics</div>
+  <div class="foot-links">
+    <a href="index.html">Home</a>
+    <a href="services.html">Services</a>
+    <a href="index.html">Portfolio</a>
+    <a href="contact.html">Contact</a>
+  </div>
+  <div class="mono" style="color:var(--stone)">© 2026 Jonny Shalom Graphics</div>
+</footer>
+
+<!-- SUCCESS MODAL -->
+<div id="success-modal" role="dialog" aria-modal="true" aria-labelledby="success-title">
+  <div class="success-box">
+    <div class="success-icon" aria-hidden="true">🎉</div>
+    <h3 id="success-title">Message Sent!</h3>
+    <p>Thank you for reaching out! I'll contact you on WhatsApp within 1–2 hours to discuss your project.</p>
+    <button class="btn-primary" onclick="closeSuccess()" style="width:100%;justify-content:center">Done</button>
+  </div>
+</div>
+
+<!-- FLOATING WHATSAPP -->
+<div id="wa-bubble" aria-label="WhatsApp contact">
+  <div class="wa-popup" id="waPopup">
+    <p>👋 Fastest reply is on WhatsApp!</p>
+    <a href="https://wa.me/2348166547674" target="_blank" rel="noopener noreferrer">Chat Now →</a>
+  </div>
+  <div class="wa-btn" onclick="toggleWa()" role="button" tabindex="0" aria-label="Open WhatsApp">💬</div>
+</div>
+
+<!-- FLOATING CONTACT -->
+<div id="float-contact">
+  <a href="https://wa.me/2348166547674" target="_blank" class="float-contact-btn" aria-label="Contact on WhatsApp">
+    💬 Contact Me
+  </a>
+</div>
+
+<!-- UTILITIES -->
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top">↑</button>
+<button id="dm-toggle" onclick="toggleDark()" aria-label="Toggle dark/light mode">🌙</button>
+<div id="toast-wrap" aria-live="polite"></div>
+
+<script>
+/* ============================================================
+   DATA
+   ============================================================ */
+const TESTIMONIALS = [
+  { text:'Jonny designed a flyer for my barbing salon and the result was outstanding. Clients kept asking who made it. Very professional and fast delivery!', name:'Bolaji Adewale',   role:'Barbing Salon Owner, Okeho', initial:'B' },
+  { text:'I needed a birthday flyer urgently and Jonny delivered within hours. The design was beautiful and exactly what I wanted. Highly recommend!',         name:'Victor Chukwu',   role:'Student',                    initial:'V' },
+  { text:'The logo Jonny made for my business is perfect. It looks professional and people always compliment it. His prices are very affordable.',              name:'Amaka Okonkwo',  role:'Business Owner',             initial:'A' },
+  { text:'Very creative and responsive. Jonny understood what I wanted immediately and the final design exceeded my expectations. Will definitely use again!',   name:'Kenny Babatunde', role:'Event Organiser',           initial:'K' },
+  { text:'Jonny designed my church banner and it was absolutely amazing. Everyone at the program loved it. God bless him for his talent and hardwork!',          name:'Pastor Emmanuel', role:'Church Leader',             initial:'P' },
+  { text:'Fast delivery, great communication, and a beautiful design every time. Jonny is the best graphic designer I have worked with. 100% recommended!',      name:'Samuel Okafor',   role:'Entrepreneur',             initial:'S' },
+];
+
+const SLOTS = [
+  { time:'Mon – Fri', label:'Morning Consultation', status:'open' },
+  { time:'Mon – Sat', label:'Afternoon Session',    status:'open' },
+  { time:'Weekends',  label:'Weekend Briefing',      status:'open' },
+  { time:'Any day',   label:'Quick WhatsApp Chat',   status:'open' },
+];
+
+/* ── Render booking slots ── */
+const slotsList = document.getElementById('slots-list');
+SLOTS.forEach(s => {
+  const el = document.createElement('div');
+  el.className = 'slot';
+  el.innerHTML = `
+    <div>
+      <div class="slot-time">${s.time}</div>
+      <div class="slot-label">${s.label}</div>
+    </div>
+    <span class="slot-status ${s.status}">${s.status === 'open' ? 'Available' : 'Booked'}</span>`;
+  slotsList.appendChild(el);
+});
+
+/* ── Render carousel ── */
+const track  = document.getElementById('carousel-track');
+const dots   = document.getElementById('carousel-dots');
+let cIdx     = 0;
+let cAuto;
+
+TESTIMONIALS.forEach((t, i) => {
+  const card = document.createElement('div');
+  card.className = 'testi-card';
+  card.setAttribute('role', 'article');
+  card.innerHTML = `
+    <div class="stars" aria-label="5 stars">★★★★★</div>
+    <p class="testi-text">${t.text}</p>
+    <div class="testi-author">
+      <div class="testi-avatar" aria-hidden="true">${t.initial}</div>
+      <div><div class="testi-name">${t.name}</div><div class="testi-role">${t.role}</div></div>
+    </div>`;
+  track.appendChild(card);
+
+  const dot = document.createElement('div');
+  dot.className = 'dot' + (i === 0 ? ' active' : '');
+  dot.setAttribute('aria-label', `Go to review ${i+1}`);
+  dot.onclick = () => goToSlide(i);
+  dots.appendChild(dot);
+});
+
+function goToSlide(idx) {
+  cIdx = (idx + TESTIMONIALS.length) % TESTIMONIALS.length;
+  const cardW = track.querySelector('.testi-card').offsetWidth + 24;
+  track.style.transform = `translateX(-${cIdx * cardW}px)`;
+  document.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('active', i === cIdx));
+}
+function carouselNav(dir) {
+  clearInterval(cAuto);
+  goToSlide(cIdx + dir);
+  startAuto();
+}
+function startAuto() {
+  cAuto = setInterval(() => goToSlide(cIdx + 1), 4000);
+}
+startAuto();
+
+/* ── Form validation & submit ── */
+function validateInquiry() {
+  let ok = true;
+  const fields = [
+    { id:'f-name',    err:'e-name',    check: v => v.trim().length > 1 },
+    { id:'f-phone',   err:'e-phone',   check: v => v.trim().length > 7 },
+    { id:'f-service', err:'e-service', check: v => v !== '' },
+    { id:'f-msg',     err:'e-msg',     check: v => v.trim().length > 10 },
+  ];
+  fields.forEach(f => {
+    const el  = document.getElementById(f.id);
+    const err = document.getElementById(f.err);
+    const valid = f.check(el.value);
+    el.classList.toggle('error', !valid);
+    err.classList.toggle('show', !valid);
+    if (!valid) ok = false;
+  });
+  return ok;
+}
+
+function submitInquiry() {
+  if (!validateInquiry()) { showToast('Please fill in all required fields.', 'error'); return; }
+  const name    = document.getElementById('f-name').value;
+  const phone   = document.getElementById('f-phone').value;
+  const service = document.getElementById('f-service').value;
+  const budget  = document.getElementById('f-budget').value;
+  const timeline= document.getElementById('f-timeline').value;
+  const msg     = document.getElementById('f-msg').value;
+  const text    = `🎨 *Project Inquiry*\n\n*Name:* ${name}\n*Phone:* ${phone}\n*Service:* ${service}\n*Budget:* ${budget||'Not specified'}\n*Timeline:* ${timeline||'Flexible'}\n\n*Message:*\n${msg}`;
+  window.open(`https://wa.me/2348166547674?text=${encodeURIComponent(text)}`, '_blank');
+  document.getElementById('success-modal').classList.add('open');
+  document.getElementById('inquiry-form').reset();
+}
+
+function closeSuccess() {
+  document.getElementById('success-modal').classList.remove('open');
+}
+document.getElementById('success-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('success-modal')) closeSuccess();
+});
+
+/* ── Newsletter ── */
+function subscribeNewsletter() {
+  const email = document.getElementById('newsletter-email').value.trim();
+  if (!email || !email.includes('@')) {
+    showToast('Please enter a valid email address.', 'error');
+    return;
+  }
+  const text = `📧 *Newsletter Subscription*\nEmail: ${email}`;
+  window.open(`https://wa.me/2348166547674?text=${encodeURIComponent(text)}`, '_blank');
+  document.getElementById('newsletter-email').value = '';
+  showToast('Thanks for subscribing! 🎉', 'success');
+}
+
+/* ── Animated counters ── */
+function animateCounters() {
+  document.querySelectorAll('.counter').forEach(el => {
+    const target = parseInt(el.dataset.target);
+    const dur    = 1800;
+    const step   = dur / target;
+    let count    = 0;
+    const timer  = setInterval(() => {
+      count++;
+      el.textContent = count;
+      if (count >= target) clearInterval(timer);
+    }, step);
+  });
+}
+let countersStarted = false;
+const statsObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting && !countersStarted) {
+      countersStarted = true;
+      animateCounters();
+      statsObs.disconnect();
+    }
+  });
+}, { threshold: .3 });
+const statsBand = document.querySelector('.stats-band');
+if (statsBand) statsObs.observe(statsBand);
+
+/* ── Upload ── */
+function handleUpload2(input) {
+  const name = input.files[0]?.name;
+  document.getElementById('upload-result2').textContent = name ? '📎 ' + name : '';
+}
+
+/* ── WhatsApp ── */
+let waOpen = false;
+function toggleWa() {
+  waOpen = !waOpen;
+  document.getElementById('waPopup').classList.toggle('show', waOpen);
+}
+setTimeout(() => { document.getElementById('waPopup').classList.add('show'); waOpen = true; }, 3500);
+setTimeout(() => { document.getElementById('waPopup').classList.remove('show'); waOpen = false; }, 8000);
+
+/* ── Toast ── */
+function showToast(msg, type='info') {
+  const wrap  = document.getElementById('toast-wrap');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<span class="t-icon">${type==='success'?'✓':type==='error'?'✕':'ℹ'}</span>${msg}`;
+  wrap.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('show'));
+  setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3500);
+}
+
+/* ── Scroll-to-top + nav scroll ── */
+window.addEventListener('scroll', () => {
+  document.getElementById('scroll-top').classList.toggle('visible', window.scrollY > 400);
+  document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 10);
+}, { passive:true });
+
+/* ── Dark mode ── */
+const dmBtn = document.getElementById('dm-toggle');
+function toggleDark() {
+  document.body.classList.toggle('light-mode');
+  const light = document.body.classList.contains('light-mode');
+  dmBtn.textContent = light ? '🌚' : '🌙';
+  localStorage.setItem('js-theme', light ? 'light' : 'dark');
+}
+if (localStorage.getItem('js-theme') === 'light') {
+  document.body.classList.add('light-mode'); dmBtn.textContent = '🌚';
+}
+
+/* ── Mobile menu ── */
+const ham = document.getElementById('hamburger');
+const mm  = document.getElementById('mobile-menu');
+ham.addEventListener('click', () => {
+  const open = mm.classList.toggle('open');
+  ham.classList.toggle('open', open);
+  ham.setAttribute('aria-expanded', open);
+});
+
+/* ── Ripple ── */
+function addRipple(el) {
+  if (!el) return;
+  el.addEventListener('click', e => {
+    const r = document.createElement('span');
+    r.className = 'ripple';
+    const rect = el.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+    el.appendChild(r);
+    setTimeout(() => r.remove(), 700);
+  });
+}
+document.querySelectorAll('.btn-primary, .btn-outline').forEach(addRipple);
+
+/* ── Scroll reveal ── */
+const revObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revObs.unobserve(e.target); } });
+}, { threshold:.08, rootMargin:'0px 0px -40px 0px' });
+function initReveal() {
+  document.querySelectorAll('.reveal,.reveal-l,.reveal-r').forEach(el => revObs.observe(el));
+}
+
+/* ── Page loader ── */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('page-loader').classList.add('done');
+    initReveal();
+  }, 1800);
+});
+
+/* ── Keyboard ── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') { closeSuccess(); if (waOpen) toggleWa(); }
+  if (e.key === 'ArrowRight') carouselNav(1);
+  if (e.key === 'ArrowLeft')  carouselNav(-1);
+});
+</script>
+</body>
+</html>

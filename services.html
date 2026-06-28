@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- ============================================================
+     JONNY SHALOM GRAPHICS — Services & Order Page
+     Extends: index.html design system
+     Version: 1.0  |  Pure HTML + CSS + Vanilla JS
+     ============================================================ -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Professional graphic design services by Jonny Shalom Graphics — logos, flyers, branding, social media and more. Affordable prices, fast delivery.">
+<meta name="theme-color" content="#0F0E0C">
+<title>Services & Pricing — Jonny Shalom Graphics</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,700&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+/* ============================================================
+   DESIGN TOKENS — identical to index.html
+   ============================================================ */
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+:root {
+  --black:   #0F0E0C;
+  --card:    #1A1917;
+  --card2:   #222018;
+  --cream:   #F5F0E8;
+  --gold:    #D4A853;
+  --gold2:   #B8893A;
+  --stone:   #6B6560;
+  --line:    rgba(245,240,232,0.1);
+  --line2:   rgba(212,168,83,0.2);
+  --wa:      #25D366;
+  --red:     #E05252;
+  --green:   #52C878;
+
+  --nav-h:   68px;
+  --max-w:   1200px;
+  --radius:  0px;          /* site uses sharp corners */
+  --ease:    cubic-bezier(.16,1,.3,1);
+}
+
+/* Dark / Light mode toggle base */
+body.light-mode {
+  --black:   #F5F0E8;
+  --card:    #EDE8DF;
+  --card2:   #E5DFD5;
+  --cream:   #1A1917;
+  --stone:   #7A7468;
+  --line:    rgba(26,25,23,0.12);
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--black);
+  color: var(--cream);
+  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+ul { list-style: none; }
+button { font-family: inherit; cursor: pointer; }
+img { display: block; max-width: 100%; }
+::selection { background: var(--gold); color: var(--black); }
+
+/* ── Utility ── */
+.mono {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--stone);
+}
+.serif { font-family: 'Playfair Display', serif; }
+.gold  { color: var(--gold); }
+.em-gold { color: var(--gold); font-style: italic; }
+
+/* ── Page loader ── */
+#page-loader {
+  position: fixed; inset: 0; z-index: 9999;
+  background: var(--black);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px;
+  transition: opacity .6s ease, visibility .6s ease;
+}
+#page-loader.done { opacity: 0; visibility: hidden; }
+.loader-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(56px,12vw,120px);
+  font-weight: 900;
+  color: var(--gold);
+  opacity: 0;
+  transform: scale(.85);
+  animation: logoIn .9s var(--ease) .2s forwards;
+  letter-spacing: -.02em;
+}
+.loader-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px; letter-spacing: .28em; text-transform: uppercase;
+  color: var(--cream); opacity: 0;
+  animation: fadeUp .7s ease .9s forwards;
+}
+.loader-track {
+  width: 180px; height: 2px;
+  background: rgba(245,240,232,.1);
+  overflow: hidden;
+}
+.loader-fill {
+  height: 100%; width: 0; background: var(--gold);
+  animation: loadFill 1.4s ease .4s forwards;
+}
+@keyframes logoIn  { to { opacity:1; transform:scale(1); } }
+@keyframes fadeUp  { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:translateY(0); } }
+@keyframes loadFill{ to { width:100%; } }
+
+/* ── Scroll-to-top ── */
+#scroll-top {
+  position: fixed; bottom: 100px; right: 28px; z-index: 200;
+  width: 44px; height: 44px;
+  background: var(--card); border: 1px solid var(--line2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; cursor: pointer;
+  opacity: 0; transform: translateY(10px);
+  transition: .3s ease;
+}
+#scroll-top.visible { opacity: 1; transform: translateY(0); }
+#scroll-top:hover { background: var(--gold); color: var(--black); border-color: var(--gold); }
+
+/* ── Dark-mode toggle ── */
+#dm-toggle {
+  position: fixed; bottom: 155px; right: 28px; z-index: 200;
+  width: 44px; height: 44px;
+  background: var(--card); border: 1px solid var(--line);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; cursor: pointer;
+  transition: background .3s, border-color .3s;
+}
+#dm-toggle:hover { border-color: var(--gold); }
+
+/* ── Toast ── */
+#toast-wrap {
+  position: fixed; bottom: 28px; left: 50%; transform: translateX(-50%);
+  z-index: 8000; display: flex; flex-direction: column; gap: 10px; align-items: center;
+  pointer-events: none;
+}
+.toast {
+  background: var(--card); border: 1px solid var(--line2);
+  color: var(--cream); font-size: 13px; padding: 12px 24px;
+  opacity: 0; transform: translateY(20px);
+  transition: .35s ease;
+  display: flex; align-items: center; gap: 10px;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateY(0); }
+.toast.success .t-icon { color: var(--green); }
+.toast.error   .t-icon { color: var(--red); }
+
+/* ============================================================
+   NAVIGATION — exact match
+   ============================================================ */
+nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  background: rgba(15,14,12,.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--line);
+  height: var(--nav-h);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px;
+  transition: background .3s;
+}
+nav.scrolled { background: rgba(15,14,12,.98); }
+.nav-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 700;
+  color: var(--gold); letter-spacing: -.01em;
+}
+.nav-links { display: flex; gap: 32px; align-items: center; }
+.nav-links a {
+  font-size: 13px; font-weight: 500;
+  color: var(--cream); opacity: .7;
+  transition: opacity .2s, color .2s;
+  cursor: pointer; position: relative; padding-bottom: 4px;
+}
+.nav-links a::after {
+  content: ''; position: absolute; bottom: 0; left: 0;
+  width: 0; height: 1px; background: var(--gold);
+  transition: width .25s ease;
+}
+.nav-links a:hover::after, .nav-links a.active::after { width: 100%; }
+.nav-links a:hover, .nav-links a.active { opacity: 1; color: var(--gold); }
+.nav-cta {
+  background: var(--gold) !important; color: var(--black) !important;
+  opacity: 1 !important; padding: 9px 18px;
+  font-weight: 600; font-size: 13px;
+  transition: background .2s, transform .2s !important;
+}
+.nav-cta::after { display: none !important; }
+.nav-cta:hover { background: var(--gold2) !important; transform: translateY(-1px); }
+.hamburger {
+  display: none; flex-direction: column; gap: 5px;
+  cursor: pointer; padding: 4px;
+}
+.hamburger span {
+  width: 24px; height: 2px;
+  background: var(--cream); transition: .3s;
+}
+.hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+.hamburger.open span:nth-child(2) { opacity: 0; }
+.hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+
+.mobile-menu {
+  display: none; position: fixed;
+  top: var(--nav-h); left: 0; right: 0;
+  background: var(--card); border-bottom: 1px solid var(--line);
+  padding: 24px 32px; flex-direction: column; gap: 20px; z-index: 99;
+  animation: slideDown .3s ease;
+}
+@keyframes slideDown { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:translateY(0); } }
+.mobile-menu.open { display: flex; }
+.mobile-menu a {
+  font-size: 16px; font-weight: 500;
+  opacity: .8; cursor: pointer; transition: opacity .2s, color .2s;
+}
+.mobile-menu a:hover { opacity: 1; color: var(--gold); }
+
+/* ============================================================
+   SCROLL REVEAL
+   ============================================================ */
+.reveal {
+  opacity: 0; transform: translateY(32px);
+  transition: opacity .75s ease, transform .75s ease;
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+.reveal-l { opacity:0; transform:translateX(-32px); transition: opacity .75s ease, transform .75s ease; }
+.reveal-l.visible { opacity:1; transform:translateX(0); }
+.reveal-r { opacity:0; transform:translateX(32px);  transition: opacity .75s ease, transform .75s ease; }
+.reveal-r.visible { opacity:1; transform:translateX(0); }
+
+/* ============================================================
+   HERO — Services
+   ============================================================ */
+.s-hero {
+  min-height: calc(100vh - var(--nav-h));
+  display: flex; flex-direction: column; justify-content: center;
+  padding: 80px 32px 60px;
+  max-width: var(--max-w); margin: 0 auto;
+  padding-top: calc(var(--nav-h) + 80px);
+}
+.hero-eyebrow {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 32px;
+}
+.pulse {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--gold);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%,100% { opacity:1; box-shadow:0 0 0 0 rgba(212,168,83,.4); }
+  50%      { opacity:.6; box-shadow:0 0 0 8px rgba(212,168,83,0); }
+}
+.s-hero h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(48px,9vw,120px);
+  font-weight: 900; line-height: .92;
+  letter-spacing: -.03em; margin-bottom: 28px;
+}
+.s-hero-desc {
+  font-size: 18px; line-height: 1.65;
+  max-width: 560px; color: rgba(245,240,232,.75); margin-bottom: 48px;
+}
+.s-hero-badges {
+  display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 56px;
+}
+.badge {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  padding: 8px 14px;
+  border: 1px solid var(--line2); color: var(--gold);
+  display: flex; align-items: center; gap: 6px;
+}
+.s-hero-btns { display: flex; gap: 16px; flex-wrap: wrap; }
+.btn-primary {
+  background: var(--gold); color: var(--black);
+  padding: 14px 28px; font-weight: 600; font-size: 15px;
+  transition: background .2s, transform .2s;
+  display: inline-flex; align-items: center; gap: 8px;
+  cursor: pointer; border: none; position: relative; overflow: hidden;
+}
+.btn-primary:hover { background: var(--gold2); transform: translateY(-2px); }
+.btn-outline {
+  border: 1px solid rgba(245,240,232,.3); color: var(--cream);
+  padding: 14px 28px; font-weight: 500; font-size: 15px;
+  transition: border-color .2s, color .2s, transform .2s;
+  display: inline-flex; align-items: center; gap: 8px;
+  cursor: pointer; background: none;
+}
+.btn-outline:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+
+/* Ripple */
+.ripple {
+  position: absolute; border-radius: 50%;
+  background: rgba(255,255,255,.25);
+  transform: scale(0);
+  animation: rippleAnim .6s linear;
+  pointer-events: none;
+}
+@keyframes rippleAnim { to { transform:scale(4); opacity:0; } }
+
+/* ============================================================
+   SERVICES GRID
+   ============================================================ */
+.section { padding: 100px 32px; max-width: var(--max-w); margin: 0 auto; }
+.section-head { margin-bottom: 64px; }
+.section-head .eyebrow { margin-bottom: 16px; }
+.section-head h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(36px,5vw,64px);
+  font-weight: 900; letter-spacing: -.025em; line-height: 1;
+}
+.section-head p {
+  margin-top: 16px; font-size: 16px;
+  color: rgba(245,240,232,.65); max-width: 520px; line-height: 1.7;
+}
+
+.srv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2px;
+  background: var(--line);
+  border: 1px solid var(--line);
+}
+
+/* Skeleton loader */
+.srv-skeleton {
+  background: var(--card);
+  padding: 40px;
+  min-height: 360px;
+  position: relative;
+  overflow: hidden;
+}
+.srv-skeleton::after {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(245,240,232,.04) 50%, transparent 100%);
+  animation: shimmer 1.6s infinite;
+}
+@keyframes shimmer { from{transform:translateX(-100%)} to{transform:translateX(100%)} }
+
+.srv-card {
+  background: var(--card);
+  padding: 40px;
+  display: flex; flex-direction: column;
+  transition: background .3s, transform .3s;
+  position: relative; overflow: hidden;
+  cursor: default;
+}
+.srv-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0;
+  height: 2px; background: var(--gold);
+  transform: scaleX(0); transform-origin: left;
+  transition: transform .4s ease;
+}
+.srv-card:hover { background: var(--card2); }
+.srv-card:hover::before { transform: scaleX(1); }
+
+.srv-icon {
+  font-size: 36px; margin-bottom: 20px;
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 64px; height: 64px;
+  background: rgba(212,168,83,.08);
+  border: 1px solid var(--line2);
+  transition: background .3s;
+}
+.srv-card:hover .srv-icon { background: rgba(212,168,83,.15); }
+
+.srv-card h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 22px; font-weight: 700; margin-bottom: 10px;
+}
+.srv-card p {
+  font-size: 14px; color: var(--stone); line-height: 1.7; flex: 1;
+}
+.srv-meta {
+  margin-top: 20px; padding-top: 20px;
+  border-top: 1px solid var(--line);
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 8px;
+}
+.srv-price {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px; color: var(--gold);
+  border: 1px solid var(--line2);
+  padding: 4px 10px;
+}
+.srv-delivery {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; color: var(--stone);
+  display: flex; align-items: center; gap: 4px;
+}
+.srv-order-btn {
+  margin-top: 20px;
+  width: 100%; padding: 12px;
+  background: transparent; border: 1px solid var(--line2);
+  color: var(--gold); font-size: 13px; font-weight: 600;
+  letter-spacing: .04em;
+  transition: background .2s, border-color .2s, color .2s;
+  position: relative; overflow: hidden;
+}
+.srv-order-btn:hover {
+  background: var(--gold); border-color: var(--gold); color: var(--black);
+}
+
+/* ============================================================
+   PRICING COMPARISON
+   ============================================================ */
+.pricing-wrap { overflow-x: auto; }
+.pricing-table {
+  width: 100%; border-collapse: collapse;
+  min-width: 600px;
+}
+.pricing-table th, .pricing-table td {
+  padding: 18px 24px;
+  text-align: left; font-size: 14px;
+  border-bottom: 1px solid var(--line);
+}
+.pricing-table th {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
+  color: var(--stone); font-weight: 500;
+  background: var(--card);
+}
+.pricing-table tr:hover td { background: var(--card2); }
+.pricing-table td:first-child { font-weight: 600; }
+.pricing-table .check { color: var(--green); font-size: 16px; }
+.pricing-table .cross { color: var(--stone); font-size: 16px; }
+.pricing-table .price-cell {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 700; color: var(--gold);
+}
+.plan-head {
+  padding: 24px; background: var(--card);
+  border-bottom: 1px solid var(--line);
+}
+.plan-name {
+  font-family: 'Playfair Display', serif;
+  font-size: 20px; font-weight: 700; margin-bottom: 6px;
+}
+.plan-sub { font-size: 12px; color: var(--stone); }
+.plan-highlight { border-top: 2px solid var(--gold); }
+.plan-highlight .plan-name { color: var(--gold); }
+
+/* ============================================================
+   FAQ
+   ============================================================ */
+.faq-list { display: flex; flex-direction: column; gap: 2px; }
+.faq-item {
+  background: var(--card);
+  border: 1px solid var(--line);
+  overflow: hidden;
+  transition: border-color .2s;
+}
+.faq-item.open { border-color: var(--line2); }
+.faq-q {
+  width: 100%; padding: 22px 28px;
+  background: none; border: none;
+  color: var(--cream); text-align: left;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+  font-size: 15px; font-weight: 500;
+  transition: color .2s; cursor: pointer;
+}
+.faq-item.open .faq-q { color: var(--gold); }
+.faq-icon {
+  width: 28px; height: 28px; flex-shrink: 0;
+  border: 1px solid var(--line); display: flex; align-items: center; justify-content: center;
+  font-size: 18px; color: var(--stone);
+  transition: transform .3s, border-color .3s, color .3s;
+}
+.faq-item.open .faq-icon {
+  transform: rotate(45deg);
+  border-color: var(--gold); color: var(--gold);
+}
+.faq-a {
+  max-height: 0; overflow: hidden;
+  transition: max-height .4s ease, padding .4s ease;
+  padding: 0 28px;
+  font-size: 14px; color: rgba(245,240,232,.7); line-height: 1.75;
+}
+.faq-item.open .faq-a { max-height: 300px; padding: 0 28px 22px; }
+
+/* ============================================================
+   TESTIMONIALS (inline)
+   ============================================================ */
+.testi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px,1fr));
+  gap: 24px;
+}
+.testi-card {
+  background: var(--card); padding: 36px;
+  border: 1px solid var(--line); position: relative;
+  transition: border-color .3s;
+}
+.testi-card:hover { border-color: var(--line2); }
+.testi-card::before {
+  content: '"';
+  font-family: 'Playfair Display', serif;
+  font-size: 80px; color: var(--gold); opacity: .25;
+  position: absolute; top: 16px; left: 24px; line-height: 1;
+}
+.stars { color: var(--gold); font-size: 14px; margin-bottom: 12px; letter-spacing: 2px; }
+.testi-text {
+  font-size: 15px; line-height: 1.75;
+  color: rgba(245,240,232,.8);
+  margin-bottom: 24px; padding-top: 32px;
+}
+.testi-author { display: flex; align-items: center; gap: 12px; }
+.testi-avatar {
+  width: 44px; height: 44px; border-radius: 50%;
+  background: var(--gold);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-weight: 700; color: var(--black); font-size: 16px;
+  flex-shrink: 0;
+}
+.testi-name { font-weight: 600; font-size: 14px; }
+.testi-role { font-size: 12px; color: var(--stone); margin-top: 2px; }
+
+/* ============================================================
+   CTA BANNER
+   ============================================================ */
+.cta-band {
+  background: var(--card);
+  border-top: 1px solid var(--line2);
+  border-bottom: 1px solid var(--line2);
+  padding: 80px 32px; text-align: center;
+}
+.cta-band h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(32px,5vw,56px);
+  font-weight: 900; letter-spacing: -.025em; margin-bottom: 16px;
+}
+.cta-band p {
+  font-size: 16px; color: var(--stone);
+  max-width: 480px; margin: 0 auto 36px; line-height: 1.7;
+}
+.cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+/* ============================================================
+   ORDER MODAL
+   ============================================================ */
+#order-modal {
+  position: fixed; inset: 0; z-index: 600;
+  background: rgba(0,0,0,.85);
+  display: none; align-items: center; justify-content: center;
+  padding: 20px;
+  backdrop-filter: blur(4px);
+}
+#order-modal.open { display: flex; }
+
+.modal-box {
+  background: var(--card);
+  border: 1px solid var(--line2);
+  width: 100%; max-width: 640px;
+  max-height: 90vh; overflow-y: auto;
+  position: relative;
+  animation: modalIn .35s var(--ease);
+}
+@keyframes modalIn {
+  from { opacity:0; transform:translateY(24px) scale(.97); }
+  to   { opacity:1; transform:translateY(0) scale(1); }
+}
+
+.modal-header {
+  padding: 32px 36px 24px;
+  border-bottom: 1px solid var(--line);
+  position: sticky; top: 0;
+  background: var(--card); z-index: 2;
+  display: flex; align-items: flex-start; justify-content: space-between; gap: 16px;
+}
+.modal-header h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 26px; font-weight: 700;
+}
+.modal-header p { font-size: 13px; color: var(--stone); margin-top: 4px; }
+.modal-close {
+  background: none; border: 1px solid var(--line);
+  width: 36px; height: 36px; flex-shrink: 0;
+  color: var(--cream); font-size: 20px; line-height: 1;
+  transition: border-color .2s, color .2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.modal-close:hover { border-color: var(--gold); color: var(--gold); }
+
+.modal-body { padding: 28px 36px 36px; }
+.form-row {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+  margin-bottom: 16px;
+}
+.form-row.full { grid-template-columns: 1fr; }
+.form-group { display: flex; flex-direction: column; gap: 8px; }
+.form-group label {
+  font-family: 'DM Mono', monospace;
+  font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--stone);
+}
+.form-group label .req { color: var(--gold); margin-left: 2px; }
+.form-group input,
+.form-group select,
+.form-group textarea {
+  background: var(--black); border: 1px solid var(--line);
+  color: var(--cream); font-family: 'DM Sans', sans-serif;
+  font-size: 14px; padding: 12px 16px;
+  transition: border-color .2s, box-shadow .2s; outline: none;
+  width: 100%;
+}
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212,168,83,.08);
+}
+.form-group input.error,
+.form-group select.error,
+.form-group textarea.error { border-color: var(--red); }
+.field-error {
+  font-size: 11px; color: var(--red);
+  display: none; margin-top: 4px;
+}
+.field-error.show { display: block; }
+.form-group select option { background: var(--card); }
+.form-group textarea { height: 110px; resize: vertical; }
+
+.upload-area {
+  border: 1px dashed rgba(212,168,83,.3);
+  padding: 28px; text-align: center;
+  cursor: pointer; transition: border-color .2s, background .2s;
+  position: relative;
+}
+.upload-area:hover { border-color: var(--gold); background: rgba(212,168,83,.04); }
+.upload-area input { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+.upload-icon { font-size: 28px; margin-bottom: 8px; }
+.upload-area p { font-size: 13px; color: var(--stone); }
+.upload-area .upload-name { color: var(--gold); font-size: 12px; margin-top: 6px; }
+
+.modal-footer {
+  padding: 0 36px 32px;
+  display: flex; align-items: center; justify-content: space-between;
+  flex-wrap: wrap; gap: 16px;
+  border-top: 1px solid var(--line); padding-top: 24px; margin-top: 8px;
+}
+.modal-footer .note { font-size: 12px; color: var(--stone); }
+.submit-btn {
+  background: var(--gold); color: var(--black);
+  border: none; padding: 14px 32px;
+  font-size: 15px; font-weight: 600;
+  transition: background .2s, transform .2s;
+  position: relative; overflow: hidden;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+.submit-btn:hover { background: var(--gold2); transform: translateY(-2px); }
+.submit-btn:disabled { opacity: .6; transform: none; cursor: not-allowed; }
+.btn-spinner {
+  width: 16px; height: 16px;
+  border: 2px solid rgba(26,25,23,.3);
+  border-top-color: var(--black);
+  border-radius: 50%;
+  animation: spin .8s linear infinite;
+  display: none;
+}
+.submit-btn.loading .btn-spinner { display: block; }
+.submit-btn.loading .btn-text { display: none; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+/* ============================================================
+   SUCCESS MODAL
+   ============================================================ */
+#success-modal {
+  position: fixed; inset: 0; z-index: 700;
+  background: rgba(0,0,0,.9);
+  display: none; align-items: center; justify-content: center;
+  padding: 20px; backdrop-filter: blur(4px);
+}
+#success-modal.open { display: flex; }
+.success-box {
+  background: var(--card); border: 1px solid var(--green);
+  padding: 48px; text-align: center; max-width: 440px; width: 100%;
+  animation: modalIn .35s var(--ease);
+}
+.success-icon { font-size: 56px; margin-bottom: 20px; }
+.success-box h3 {
+  font-family: 'Playfair Display', serif;
+  font-size: 28px; font-weight: 700; margin-bottom: 12px;
+}
+.success-box p { font-size: 15px; color: var(--stone); line-height: 1.65; margin-bottom: 28px; }
+
+/* ============================================================
+   FLOATING WHATSAPP
+   ============================================================ */
+#wa-bubble {
+  position: fixed; bottom: 28px; right: 28px; z-index: 200;
+  display: flex; flex-direction: column; align-items: flex-end; gap: 12px;
+}
+.wa-popup {
+  background: var(--card); border: 1px solid var(--line);
+  padding: 16px 20px; max-width: 220px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.4);
+  opacity: 0; transform: translateY(10px) scale(.95);
+  transition: .3s; pointer-events: none;
+  display: none;
+}
+.wa-popup.show { opacity:1; transform:translateY(0) scale(1); pointer-events:all; display:block; }
+.wa-popup p { font-size: 13px; line-height: 1.5; color: var(--cream); margin-bottom: 10px; }
+.wa-popup a {
+  display: block; background: var(--wa); color: #fff;
+  text-align: center; padding: 10px; font-size: 13px; font-weight: 600;
+  transition: opacity .2s;
+}
+.wa-popup a:hover { opacity: .85; }
+.wa-btn {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--wa);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: 0 4px 20px rgba(37,211,102,.3);
+  transition: transform .2s; font-size: 26px;
+}
+.wa-btn:hover { transform: scale(1.1); }
+
+/* ============================================================
+   FOOTER — exact match
+   ============================================================ */
+footer {
+  border-top: 1px solid var(--line);
+  padding: 40px 32px;
+  max-width: var(--max-w); margin: 0 auto;
+  display: flex; justify-content: space-between;
+  align-items: center; flex-wrap: wrap; gap: 16px;
+}
+.foot-logo {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px; font-weight: 700; color: var(--gold);
+}
+.foot-links { display: flex; gap: 24px; flex-wrap: wrap; }
+.foot-links a {
+  font-size: 13px; color: var(--stone);
+  transition: color .2s; cursor: pointer;
+}
+.foot-links a:hover { color: var(--gold); }
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width: 900px) {
+  .nav-links { display: none; }
+  .hamburger { display: flex; }
+  .section { padding: 60px 20px; }
+  .s-hero { padding: 40px 20px; padding-top: calc(var(--nav-h) + 40px); }
+  .form-row { grid-template-columns: 1fr; }
+  .modal-header, .modal-body, .modal-footer { padding-left: 24px; padding-right: 24px; }
+  footer { padding: 32px 20px; }
+  #dm-toggle, #scroll-top { right: 16px; }
+}
+@media (max-width: 560px) {
+  .srv-grid { grid-template-columns: 1fr; }
+  .testi-grid { grid-template-columns: 1fr; }
+  .cta-btns { flex-direction: column; align-items: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     PAGE LOADER
+     ============================================================ -->
+<div id="page-loader" role="status" aria-label="Loading">
+  <div class="loader-logo" aria-hidden="true">JS</div>
+  <div class="loader-sub">Services &amp; Pricing</div>
+  <div class="loader-track"><div class="loader-fill"></div></div>
+</div>
+
+<!-- ============================================================
+     NAVIGATION
+     ============================================================ -->
+<nav id="main-nav" role="navigation" aria-label="Main navigation">
+  <a class="nav-logo" href="index.html" aria-label="Jonny Shalom Graphics home">JS/graphics</a>
+  <div class="nav-links" role="menubar">
+    <a href="index.html" role="menuitem">Home</a>
+    <a href="services.html" class="active" role="menuitem" aria-current="page">Services</a>
+    <a href="index.html#page-portfolio" role="menuitem">Portfolio</a>
+    <a href="index.html#page-about" role="menuitem">About</a>
+    <a href="contact.html" role="menuitem">Contact</a>
+    <a href="contact.html" class="nav-cta" role="menuitem">Hire Me</a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Toggle mobile menu" aria-expanded="false">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu" id="mobile-menu" role="menu">
+  <a href="index.html">Home</a>
+  <a href="services.html" style="color:var(--gold)">Services</a>
+  <a href="index.html">Portfolio</a>
+  <a href="index.html">About</a>
+  <a href="contact.html">Contact</a>
+  <a href="contact.html" style="color:var(--gold)">Hire Me →</a>
+</div>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<main>
+<section class="s-hero" aria-labelledby="hero-title">
+  <div class="hero-eyebrow reveal">
+    <div class="pulse" aria-hidden="true"></div>
+    <span class="mono">Creative Design Services — 2026</span>
+  </div>
+  <h1 id="hero-title" class="reveal">
+    Premium<br><span class="gold">Design</span><br><em style="font-style:italic;color:var(--stone)">Services</em>
+  </h1>
+  <p class="s-hero-desc reveal">
+    From a simple flyer to a complete brand identity — every project is handled with care, creativity, and professional quality. Fast delivery. Affordable prices.
+  </p>
+  <div class="s-hero-badges reveal">
+    <div class="badge">⚡ Fast Delivery</div>
+    <div class="badge">✅ 100% Satisfaction</div>
+    <div class="badge">💬 WhatsApp Support</div>
+    <div class="badge">🎨 12+ Services</div>
+  </div>
+  <div class="s-hero-btns reveal">
+    <button class="btn-primary" onclick="openModal()" aria-haspopup="dialog">
+      Order a Design <span aria-hidden="true">→</span>
+    </button>
+    <a href="contact.html" class="btn-outline">Get Free Quote</a>
+  </div>
+</section>
+
+<!-- ============================================================
+     SERVICES GRID
+     ============================================================ -->
+<section class="section" aria-labelledby="services-title">
+  <div class="section-head reveal">
+    <div class="mono eyebrow">What I offer</div>
+    <h2 id="services-title">All <em class="em-gold">Services</em></h2>
+    <p>Professional graphic design for every need. Click "Order Now" on any card to get started instantly.</p>
+  </div>
+  <div class="srv-grid" id="srv-grid">
+    <!-- Cards injected by JS for clean maintainability -->
+  </div>
+</section>
+
+<!-- ============================================================
+     PRICING TABLE
+     ============================================================ -->
+<section class="section" style="padding-top:0" aria-labelledby="pricing-title">
+  <div class="section-head reveal">
+    <div class="mono eyebrow">Compare Plans</div>
+    <h2 id="pricing-title">Pricing <em class="em-gold">Overview</em></h2>
+    <p>Transparent pricing with no hidden charges. All prices in Nigerian Naira.</p>
+  </div>
+  <div class="pricing-wrap reveal">
+    <table class="pricing-table" role="table" aria-label="Service pricing comparison">
+      <thead>
+        <tr>
+          <th>Service</th>
+          <th class="plan-head">
+            <div class="plan-name">Basic</div>
+            <div class="plan-sub">Single deliverable</div>
+          </th>
+          <th class="plan-head plan-highlight">
+            <div class="plan-name">Standard</div>
+            <div class="plan-sub">Most popular</div>
+          </th>
+          <th class="plan-head">
+            <div class="plan-name">Premium</div>
+            <div class="plan-sub">Full package</div>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Logo Design</td>
+          <td class="price-cell">₦5,000</td>
+          <td class="price-cell" style="color:var(--gold)">₦10,000</td>
+          <td class="price-cell">₦20,000</td>
+        </tr>
+        <tr>
+          <td>Flyer Design</td>
+          <td class="price-cell">₦2,000</td>
+          <td class="price-cell" style="color:var(--gold)">₦4,000</td>
+          <td class="price-cell">₦8,000</td>
+        </tr>
+        <tr>
+          <td>Social Media Pack</td>
+          <td class="price-cell">₦1,500</td>
+          <td class="price-cell" style="color:var(--gold)">₦5,000</td>
+          <td class="price-cell">₦12,000</td>
+        </tr>
+        <tr>
+          <td>Brand Identity</td>
+          <td class="price-cell">₦15,000</td>
+          <td class="price-cell" style="color:var(--gold)">₦30,000</td>
+          <td class="price-cell">₦60,000</td>
+        </tr>
+        <tr>
+          <td>Source Files Included</td>
+          <td class="cross">✗</td>
+          <td class="check">✓</td>
+          <td class="check">✓</td>
+        </tr>
+        <tr>
+          <td>Unlimited Revisions</td>
+          <td class="cross">✗</td>
+          <td class="cross">✗</td>
+          <td class="check">✓</td>
+        </tr>
+        <tr>
+          <td>Priority Support</td>
+          <td class="cross">✗</td>
+          <td class="check">✓</td>
+          <td class="check">✓</td>
+        </tr>
+        <tr>
+          <td>Delivery Time</td>
+          <td>3–5 days</td>
+          <td style="color:var(--gold)">1–2 days</td>
+          <td>Same day</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ============================================================
+     FAQ
+     ============================================================ -->
+<section class="section" style="padding-top:0" aria-labelledby="faq-title">
+  <div class="section-head reveal">
+    <div class="mono eyebrow">Common Questions</div>
+    <h2 id="faq-title">FAQ</h2>
+  </div>
+  <div class="faq-list reveal" id="faq-list"></div>
+</section>
+
+<!-- ============================================================
+     TESTIMONIALS
+     ============================================================ -->
+<section class="section" style="padding-top:0" aria-labelledby="reviews-title">
+  <div class="section-head reveal">
+    <div class="mono eyebrow">Client Reviews</div>
+    <h2 id="reviews-title">What Clients <em class="em-gold">Say</em></h2>
+  </div>
+  <div class="testi-grid">
+    <div class="testi-card reveal">
+      <div class="stars" aria-label="5 stars">★★★★★</div>
+      <p class="testi-text">Jonny delivered my business flyer in under 2 hours. The design was stunning — exactly what I had in mind. My customers kept asking who made it!</p>
+      <div class="testi-author">
+        <div class="testi-avatar" aria-hidden="true">B</div>
+        <div><div class="testi-name">Bolaji Adewale</div><div class="testi-role">Barbing Salon Owner, Okeho</div></div>
+      </div>
+    </div>
+    <div class="testi-card reveal">
+      <div class="stars" aria-label="5 stars">★★★★★</div>
+      <p class="testi-text">The logo he designed for my brand is fire! Very professional, affordable price, and he understood my vision on the first try. Highly recommended!</p>
+      <div class="testi-author">
+        <div class="testi-avatar" aria-hidden="true">A</div>
+        <div><div class="testi-name">Amaka Okonkwo</div><div class="testi-role">Fashion Brand Owner</div></div>
+      </div>
+    </div>
+    <div class="testi-card reveal">
+      <div class="stars" aria-label="5 stars">★★★★★</div>
+      <p class="testi-text">I've used Jonny for 3 different projects — birthday flyers, church banner, and business card. Every single time he exceeds expectations. Best designer!</p>
+      <div class="testi-author">
+        <div class="testi-avatar" aria-hidden="true">K</div>
+        <div><div class="testi-name">Kenny Babatunde</div><div class="testi-role">Event Organiser</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CTA BAND
+     ============================================================ -->
+<div class="cta-band reveal">
+  <div class="mono" style="margin-bottom:16px">Ready to get started?</div>
+  <h2>Let's Build Something <em class="em-gold">Beautiful</em></h2>
+  <p>Place your order today and get a professional design delivered straight to your WhatsApp.</p>
+  <div class="cta-btns">
+    <button class="btn-primary" onclick="openModal()">Order a Design Now →</button>
+    <a href="contact.html" class="btn-outline">Ask a Question</a>
+  </div>
+</div>
+</main>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer>
+  <div class="foot-logo">JS/graphics</div>
+  <div class="foot-links">
+    <a href="index.html">Home</a>
+    <a href="services.html">Services</a>
+    <a href="index.html">Portfolio</a>
+    <a href="contact.html">Contact</a>
+  </div>
+  <div class="mono" style="color:var(--stone)">© 2026 Jonny Shalom Graphics</div>
+</footer>
+
+<!-- ============================================================
+     ORDER MODAL
+     ============================================================ -->
+<div id="order-modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3 id="modal-title">Order a Design</h3>
+        <p>Fill in the details below and I'll get back to you on WhatsApp.</p>
+      </div>
+      <button class="modal-close" onclick="closeModal()" aria-label="Close order form">×</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="m-name">Full Name<span class="req">*</span></label>
+          <input id="m-name" type="text" placeholder="Your full name" autocomplete="name">
+          <span class="field-error" id="err-name">Please enter your name</span>
+        </div>
+        <div class="form-group">
+          <label for="m-email">Email Address</label>
+          <input id="m-email" type="email" placeholder="you@email.com" autocomplete="email">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="m-phone">WhatsApp Number<span class="req">*</span></label>
+          <input id="m-phone" type="tel" placeholder="+234..." autocomplete="tel">
+          <span class="field-error" id="err-phone">Please enter your WhatsApp number</span>
+        </div>
+        <div class="form-group">
+          <label for="m-cat">Design Category<span class="req">*</span></label>
+          <select id="m-cat">
+            <option value="">Select a service…</option>
+            <option>Logo Design</option>
+            <option>Flyer Design</option>
+            <option>Social Media Design</option>
+            <option>Brand Identity</option>
+            <option>Business Card Design</option>
+            <option>Banner Design</option>
+            <option>Book Cover</option>
+            <option>Church Design</option>
+            <option>Birthday Flyer</option>
+            <option>Event Graphics</option>
+            <option>Packaging Design</option>
+            <option>Custom / Other</option>
+          </select>
+          <span class="field-error" id="err-cat">Please select a service</span>
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group">
+          <label for="m-desc">Project Description<span class="req">*</span></label>
+          <textarea id="m-desc" placeholder="Describe what you need — colors, style, size, text to include…"></textarea>
+          <span class="field-error" id="err-desc">Please describe your project</span>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="m-budget">Budget (₦)</label>
+          <select id="m-budget">
+            <option value="">Select budget range…</option>
+            <option>Under ₦2,000</option>
+            <option>₦2,000 – ₦5,000</option>
+            <option>₦5,000 – ₦10,000</option>
+            <option>₦10,000 – ₦30,000</option>
+            <option>₦30,000+</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="m-deadline">Delivery Deadline</label>
+          <input id="m-deadline" type="date">
+        </div>
+      </div>
+      <div class="form-row full">
+        <div class="form-group">
+          <label>Upload Design Brief (optional)</label>
+          <div class="upload-area" id="upload-area">
+            <input type="file" id="m-file" accept=".pdf,.png,.jpg,.docx" onchange="handleFile(this)">
+            <div class="upload-icon" aria-hidden="true">📎</div>
+            <p>Click to upload or drag &amp; drop</p>
+            <p style="font-size:11px;margin-top:4px">PDF, PNG, JPG, DOCX — max 10MB</p>
+            <div class="upload-name" id="upload-name"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <span class="note">🔒 Your info is safe and private</span>
+      <button class="submit-btn" id="submit-btn" onclick="submitOrder()">
+        <span class="btn-text">Submit Order →</span>
+        <span class="btn-spinner" aria-hidden="true"></span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ============================================================
+     SUCCESS MODAL
+     ============================================================ -->
+<div id="success-modal" role="dialog" aria-modal="true" aria-labelledby="success-title">
+  <div class="success-box">
+    <div class="success-icon" aria-hidden="true">🎉</div>
+    <h3 id="success-title">Order Received!</h3>
+    <p>Thank you! Your order has been sent. I'll contact you on WhatsApp within 1–2 hours to discuss the details.</p>
+    <button class="btn-primary" onclick="closeSuccess()" style="width:100%;justify-content:center">
+      Continue Browsing
+    </button>
+  </div>
+</div>
+
+<!-- ============================================================
+     FLOATING WHATSAPP
+     ============================================================ -->
+<div id="wa-bubble" aria-label="WhatsApp contact">
+  <div class="wa-popup" id="waPopup" role="complementary">
+    <p>👋 Need a design? Message me now — I reply fast!</p>
+    <a href="https://wa.me/2348166547674" target="_blank" rel="noopener noreferrer">Chat on WhatsApp →</a>
+  </div>
+  <div class="wa-btn" onclick="toggleWa()" role="button" tabindex="0" aria-label="Open WhatsApp chat" onkeypress="if(event.key==='Enter')toggleWa()">💬</div>
+</div>
+
+<!-- Utilities -->
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top">↑</button>
+<button id="dm-toggle" onclick="toggleDark()" aria-label="Toggle dark mode">🌙</button>
+<div id="toast-wrap" aria-live="polite"></div>
+
+<!-- ============================================================
+     JAVASCRIPT
+     ============================================================ -->
+<script>
+/* ── Data ── */
+const SERVICES = [
+  { icon:'🎨', title:'Logo Design',         desc:'Memorable logos and brand marks that stand out. Delivered in all formats.',                     price:'From ₦5,000',  delivery:'2–3 days' },
+  { icon:'📄', title:'Flyer Design',         desc:'Eye-catching flyers for events, promos and businesses that drive action.',                       price:'From ₦2,000',  delivery:'Same day' },
+  { icon:'📱', title:'Social Media Design',  desc:'Scroll-stopping posts, stories and banners for Instagram, Facebook and more.',                   price:'From ₦1,500',  delivery:'Same day' },
+  { icon:'🏢', title:'Brand Identity',       desc:'Complete brand systems — logo, colours, fonts, stationery and guidelines.',                      price:'From ₦15,000', delivery:'3–5 days' },
+  { icon:'💼', title:'Business Cards',       desc:'Professional business cards designed to leave a lasting impression.',                            price:'From ₦2,500',  delivery:'1–2 days' },
+  { icon:'🖼️', title:'Banner Design',        desc:'Large-format banners, flex prints and signage for events and shops.',                            price:'From ₦3,000',  delivery:'1–2 days' },
+  { icon:'📚', title:'Book Covers',          desc:'Compelling book cover designs that attract readers and boost sales.',                            price:'From ₦5,000',  delivery:'2–3 days' },
+  { icon:'✝️', title:'Church Designs',       desc:'Banners, bulletins, flyers and graphics for churches and ministries.',                          price:'From ₦2,000',  delivery:'1–2 days' },
+  { icon:'🎂', title:'Birthday Flyers',      desc:'Beautiful personalised birthday flyers and cards with photo compositing.',                       price:'From ₦1,500',  delivery:'Same day' },
+  { icon:'🎉', title:'Event Graphics',       desc:'Full event branding — invitations, banners, tickets, social posts and more.',                    price:'From ₦5,000',  delivery:'2–3 days' },
+  { icon:'📦', title:'Packaging Design',     desc:'Product labels, box packaging and wrapper designs that sell on the shelf.',                      price:'From ₦8,000',  delivery:'3–5 days' },
+  { icon:'✨', title:'Custom Designs',       desc:"Have something unique in mind? Let's talk — I design it no matter what it is.",                  price:'Get a quote',  delivery:'Varies'   },
+];
+
+const FAQS = [
+  { q:'How do I place an order?',          a:'Simply click the "Order Now" button on any service card, fill in the short form, and I\'ll reach out on WhatsApp within 1–2 hours to discuss the details and get started.' },
+  { q:'What is your turnaround time?',     a:'It depends on the project. Simple flyers can be done the same day. Logos take 2–3 days. Full brand identity packages take 3–7 days. Rush orders are available for most services.' },
+  { q:'How do you accept payment?',        a:'I accept bank transfer, Opay, and other mobile payment options. A 50% deposit is required before work begins, with the remaining 50% on delivery.' },
+  { q:'Do I get the source files?',        a:'Yes — Standard and Premium orders include editable source files (AI, PSD, or Corel). Basic orders include final print/web-ready files only (PNG, PDF, JPG).' },
+  { q:'How many revisions do I get?',      a:'Basic: 2 revisions. Standard: 5 revisions. Premium: Unlimited revisions until you are 100% happy with the result.' },
+  { q:'Can you design on short notice?',   a:'Absolutely! For urgent orders, message me on WhatsApp and I\'ll prioritise your project. A small rush fee may apply for same-day delivery.' },
+  { q:'What information do you need?',     a:'Business name, what the design is for, preferred colours and style, any text to include, and any reference images. The more detail you give, the better the result.' },
+];
+
+/* ── Render service cards ── */
+const grid = document.getElementById('srv-grid');
+SERVICES.forEach(s => {
+  const card = document.createElement('div');
+  card.className = 'srv-card reveal';
+  card.setAttribute('role', 'article');
+  card.innerHTML = `
+    <div class="srv-icon" aria-hidden="true">${s.icon}</div>
+    <h3>${s.title}</h3>
+    <p>${s.desc}</p>
+    <div class="srv-meta">
+      <span class="srv-price">${s.price}</span>
+      <span class="srv-delivery">⏱ ${s.delivery}</span>
+    </div>
+    <button class="srv-order-btn" onclick="openModal('${s.title}')" aria-label="Order ${s.title}">
+      Order Now →
+    </button>`;
+  grid.appendChild(card);
+  addRipple(card.querySelector('.srv-order-btn'));
+});
+
+/* ── Render FAQ ── */
+const faqList = document.getElementById('faq-list');
+FAQS.forEach((f, i) => {
+  const item = document.createElement('div');
+  item.className = 'faq-item';
+  item.setAttribute('role', 'listitem');
+  item.innerHTML = `
+    <button class="faq-q" aria-expanded="false" aria-controls="faq-a-${i}" onclick="toggleFaq(this)">
+      <span>${f.q}</span>
+      <span class="faq-icon" aria-hidden="true">+</span>
+    </button>
+    <div class="faq-a" id="faq-a-${i}" role="region">${f.a}</div>`;
+  faqList.appendChild(item);
+});
+
+function toggleFaq(btn) {
+  const item = btn.parentElement;
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item.open').forEach(el => {
+    el.classList.remove('open');
+    el.querySelector('.faq-q').setAttribute('aria-expanded','false');
+  });
+  if (!isOpen) {
+    item.classList.add('open');
+    btn.setAttribute('aria-expanded','true');
+  }
+}
+
+/* ── Order Modal ── */
+function openModal(service) {
+  const modal = document.getElementById('order-modal');
+  modal.classList.add('open');
+  document.body.style.overflow = 'hidden';
+  if (service) {
+    const sel = document.getElementById('m-cat');
+    for (let o of sel.options) { if (o.text === service) { sel.value = o.value || o.text; break; } }
+  }
+  document.getElementById('m-name').focus();
+}
+function closeModal() {
+  document.getElementById('order-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('order-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('order-modal')) closeModal();
+});
+
+/* ── Form Validation ── */
+function validate() {
+  let ok = true;
+  const fields = [
+    { id:'m-name',  err:'err-name',  check: v => v.trim().length > 1 },
+    { id:'m-phone', err:'err-phone', check: v => v.trim().length > 7 },
+    { id:'m-cat',   err:'err-cat',   check: v => v !== '' },
+    { id:'m-desc',  err:'err-desc',  check: v => v.trim().length > 10 },
+  ];
+  fields.forEach(f => {
+    const el = document.getElementById(f.id);
+    const err = document.getElementById(f.err);
+    const valid = f.check(el.value);
+    el.classList.toggle('error', !valid);
+    err.classList.toggle('show', !valid);
+    if (!valid) ok = false;
+  });
+  return ok;
+}
+
+/* ── Submit Order ── */
+function submitOrder() {
+  if (!validate()) { showToast('Please fill in all required fields.', 'error'); return; }
+  const btn = document.getElementById('submit-btn');
+  btn.classList.add('loading'); btn.disabled = true;
+
+  setTimeout(() => {
+    const name  = document.getElementById('m-name').value;
+    const phone = document.getElementById('m-phone').value;
+    const cat   = document.getElementById('m-cat').value;
+    const desc  = document.getElementById('m-desc').value;
+    const budget= document.getElementById('m-budget').value;
+    const dl    = document.getElementById('m-deadline').value;
+    const msg   = `🎨 *New Design Order*\n\n*Name:* ${name}\n*Phone:* ${phone}\n*Service:* ${cat}\n*Budget:* ${budget||'Not specified'}\n*Deadline:* ${dl||'Flexible'}\n\n*Project Details:*\n${desc}`;
+    window.open(`https://wa.me/2348166547674?text=${encodeURIComponent(msg)}`, '_blank');
+    btn.classList.remove('loading'); btn.disabled = false;
+    closeModal();
+    document.getElementById('success-modal').classList.add('open');
+  }, 1600);
+}
+
+function closeSuccess() {
+  document.getElementById('success-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+document.getElementById('success-modal').addEventListener('click', e => {
+  if (e.target === document.getElementById('success-modal')) closeSuccess();
+});
+
+/* ── File Upload ── */
+function handleFile(input) {
+  const name = input.files[0]?.name;
+  document.getElementById('upload-name').textContent = name ? '📎 ' + name : '';
+}
+
+/* ── WhatsApp ── */
+let waOpen = false;
+function toggleWa() {
+  waOpen = !waOpen;
+  document.getElementById('waPopup').classList.toggle('show', waOpen);
+}
+setTimeout(() => { document.getElementById('waPopup').classList.add('show'); waOpen = true; }, 4000);
+setTimeout(() => { document.getElementById('waPopup').classList.remove('show'); waOpen = false; }, 9000);
+
+/* ── Toast ── */
+function showToast(msg, type = 'info') {
+  const wrap = document.getElementById('toast-wrap');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<span class="t-icon">${type==='success'?'✓':type==='error'?'✕':'ℹ'}</span>${msg}`;
+  wrap.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('show'));
+  setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 400); }, 3500);
+}
+
+/* ── Scroll-to-top ── */
+const scrollBtn = document.getElementById('scroll-top');
+window.addEventListener('scroll', () => {
+  scrollBtn.classList.toggle('visible', window.scrollY > 400);
+  document.getElementById('main-nav').classList.toggle('scrolled', window.scrollY > 10);
+}, { passive: true });
+
+/* ── Dark mode ── */
+const dmBtn = document.getElementById('dm-toggle');
+function toggleDark() {
+  document.body.classList.toggle('light-mode');
+  const light = document.body.classList.contains('light-mode');
+  dmBtn.textContent = light ? '🌚' : '🌙';
+  localStorage.setItem('js-theme', light ? 'light' : 'dark');
+}
+if (localStorage.getItem('js-theme') === 'light') {
+  document.body.classList.add('light-mode'); dmBtn.textContent = '🌚';
+}
+
+/* ── Mobile menu ── */
+const ham = document.getElementById('hamburger');
+const mm  = document.getElementById('mobile-menu');
+function toggleMenu() {
+  const open = mm.classList.toggle('open');
+  ham.classList.toggle('open', open);
+  ham.setAttribute('aria-expanded', open);
+}
+ham.addEventListener('click', toggleMenu);
+
+/* ── Ripple effect ── */
+function addRipple(el) {
+  if (!el) return;
+  el.addEventListener('click', e => {
+    const r = document.createElement('span');
+    r.className = 'ripple';
+    const rect = el.getBoundingClientRect();
+    const size = Math.max(rect.width, rect.height);
+    r.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px`;
+    el.appendChild(r);
+    setTimeout(() => r.remove(), 700);
+  });
+}
+document.querySelectorAll('.btn-primary, .btn-outline, .submit-btn').forEach(addRipple);
+
+/* ── Scroll reveal ── */
+const revealObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); revealObs.unobserve(e.target); } });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+function initReveal() { document.querySelectorAll('.reveal,.reveal-l,.reveal-r').forEach(el => revealObs.observe(el)); }
+
+/* ── Page loader ── */
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('page-loader').classList.add('done');
+    initReveal();
+  }, 1800);
+});
+
+/* ── Keyboard: close modals on Escape ── */
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    closeModal();
+    closeSuccess();
+    if (waOpen) toggleWa();
+  }
+});
+</script>
+</body>
+</html>
